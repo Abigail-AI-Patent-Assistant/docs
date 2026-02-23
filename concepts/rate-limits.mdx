@@ -1,0 +1,71 @@
+---
+title: Rate Limits
+description: Request limits and throttling behavior.
+---
+
+The Abigail API enforces rate limits to ensure fair usage and service stability.
+
+## Limits
+
+| Tier | Rate | Burst |
+| --- | --- | --- |
+| Free endpoints | 60 requests/minute | 10 requests/second |
+| API key (paid) | 120 requests/minute | 20 requests/second |
+
+Rate limits are applied per API key (for authenticated requests) or per IP address
+(for free endpoints).
+
+## Rate limit headers
+
+Every response includes rate limit headers:
+
+```
+X-RateLimit-Limit: 120
+X-RateLimit-Remaining: 117
+X-RateLimit-Reset: 1708732800
+```
+
+## Handling 429 responses
+
+When rate limited, the API returns HTTP 429:
+
+```json
+{
+  "error": true,
+  "error_code": "rate_limited",
+  "message": "Rate limit exceeded. Try again in 3 seconds.",
+  "agent_suggestion": "You are sending requests too quickly. Wait 3 seconds before retrying."
+}
+```
+
+Implement exponential backoff in your agent:
+
+```python
+import time
+import httpx
+
+def call_with_retry(url, headers, json_body, max_retries=3):
+    for attempt in range(max_retries):
+        resp = httpx.post(url, headers=headers, json=json_body)
+        if resp.status_code == 429:
+            wait = 2 ** attempt  # 1, 2, 4 seconds
+            time.sleep(wait)
+            continue
+        return resp
+    raise Exception("Rate limit exceeded after retries")
+```
+
+## Billing
+
+Paid endpoints use Stripe metered billing. You are charged per successful call:
+
+| Endpoint | Price |
+| --- | --- |
+| `/v1/openclaw/analyze` | $5 per call |
+| `/v1/openclaw/draft-roa` | $10 per call |
+| `/v1/openclaw/examiner/{name}` | $1 per call |
+
+Free endpoints (`/lookup`, `/deadlines`) and status polling (`/draft-roa/status`) are
+never billed.
+
+Failed requests (4xx, 5xx) are not billed.

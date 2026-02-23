@@ -1,0 +1,49 @@
+---
+title: Poll Draft Status
+openapi: "openapi.json GET /v1/openclaw/draft-roa/status/{job_id}"
+---
+
+Poll this endpoint to check the progress of an ROA drafting job.
+
+## Status values
+
+| Status | Meaning | `download_url` present? |
+| --- | --- | --- |
+| `queued` | Job is waiting for a worker | No |
+| `in_progress` | Job is actively generating the document | No |
+| `complete` | Document is ready for download | Yes |
+| `failed` | Job failed (see `error_message`) | No |
+
+## Polling strategy
+
+Poll every 5 seconds. Typical drafting jobs complete in 30-120 seconds.
+
+```python
+import time
+import httpx
+
+def wait_for_draft(base_url, job_id, api_key, timeout=300):
+    headers = {"X-API-Key": api_key}
+    start = time.time()
+    while time.time() - start < timeout:
+        resp = httpx.get(
+            f"{base_url}/v1/openclaw/draft-roa/status/{job_id}",
+            headers=headers,
+        )
+        data = resp.json()
+        if data["status"] == "complete":
+            return data["download_url"]
+        if data["status"] == "failed":
+            raise Exception(f"Draft failed: {data.get('error_message')}")
+        time.sleep(5)
+    raise TimeoutError("Draft did not complete within timeout")
+```
+
+## Download URL
+
+The `download_url` is a signed URL that includes a JWT token. It expires after
+**1 hour**. If it expires, re-poll this endpoint to get a fresh URL.
+
+<Note>
+  Polling this endpoint is free and not billed.
+</Note>

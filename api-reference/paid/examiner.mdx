@@ -1,0 +1,27 @@
+---
+title: Examiner Intelligence
+openapi: "openapi.json GET /v1/openclaw/examiner/{examiner_name}"
+---
+
+Get an intelligence profile for a USPTO patent examiner, including historical
+allowance rates, rejection patterns, and interview success rates.
+
+## Name format
+
+Examiner names must be in `LASTNAME, FIRSTNAME M` format and URL-encoded:
+
+```
+/v1/openclaw/examiner/SMITH%2C%20JOHN%20A
+```
+
+<Tip>
+  Use the `/lookup` endpoint first to get the exact examiner name from a
+  patent application. The `examiner_name` field in the lookup response is
+  already in the correct format.
+</Tip>
+
+## Use cases
+
+- **Pre-analysis**: Check examiner behavior before choosing a response strategy
+- **Interview prep**: High `interview_success_rate` suggests scheduling an examiner interview
+- **Workload assessment**: `avg_actions_to_allowance` indicates how many rounds to expect

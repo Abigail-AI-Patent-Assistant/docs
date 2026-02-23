@@ -1,0 +1,64 @@
+---
+title: Agent Suggestions
+description: Every error includes actionable guidance for AI agents.
+---
+
+The Abigail API is designed for consumption by AI agents (OpenClaw, custom LLM workflows).
+Every error response includes an `agent_suggestion` field with specific, actionable guidance
+that an agent can follow without human intervention.
+
+## Error response format
+
+```json
+{
+  "error": true,
+  "error_code": "app_not_found",
+  "message": "Application 17200011 not found in USPTO Patent Center.",
+  "agent_suggestion": "Application not found. Verify the number format (17200011 or 17/200,011) and check for typos."
+}
+```
+
+## Fields
+
+| Field | Type | Purpose |
+| --- | --- | --- |
+| `error` | boolean | Always `true` for error responses |
+| `error_code` | string | Machine-readable error code for programmatic handling |
+| `message` | string | Human-readable description |
+| `agent_suggestion` | string | Actionable next step for AI agents |
+
+## Error codes
+
+| Code | HTTP | Meaning |
+| --- | --- | --- |
+| `app_not_found` | 404 | Application number not in database |
+| `examiner_not_found` | 404 | Examiner name not found |
+| `missing_api_key` | 401 | No X-API-Key header provided |
+| `invalid_api_key` | 401 | Key not recognized |
+| `revoked_api_key` | 401 | Key has been revoked |
+| `invalid_download_token` | 401 | Download token expired or invalid |
+| `token_job_mismatch` | 403 | Download token issued for a different job |
+
+## Agent implementation pattern
+
+```python
+response = httpx.get(f"{BASE_URL}/v1/openclaw/lookup/{app_number}")
+
+if response.status_code != 200:
+    error = response.json()
+    code = error.get("error_code")
+    suggestion = error.get("agent_suggestion", "")
+
+    if code == "app_not_found":
+        # Try normalizing the number
+        normalized = app_number.replace("/", "").replace(",", "")
+        response = httpx.get(f"{BASE_URL}/v1/openclaw/lookup/{normalized}")
+    elif code == "missing_api_key":
+        # Prompt user for API key
+        return f"I need an API key to proceed. {suggestion}"
+    elif code == "revoked_api_key":
+        return f"Your API key has been revoked. {suggestion}"
+```
+
+The `agent_suggestion` text is written so that an LLM agent can include it directly
+in a response to the user.

@@ -1,0 +1,28 @@
+---
+title: Download DOCX
+openapi: "openapi.json GET /v1/openclaw/download/{job_id}"
+---
+
+Download a completed Response to Office Action document in DOCX format.
+
+## Authentication
+
+This endpoint uses **signed URL tokens** instead of API keys. The token is included
+in the `download_url` from the Poll Draft Status endpoint response.
+
+No `X-API-Key` header is needed -- the token IS the authentication.
+
+## Token expiration
+
+Download tokens expire after **1 hour**. If the token has expired, re-poll the
+draft status endpoint to get a fresh URL:
+
+```bash
+# Get fresh download URL
+curl -H "X-API-Key: abi_sk_..." \
+  https://api.abigail.app/v1/openclaw/draft-roa/status/roa_abc123
+
+# Use the new download_url from the response
+curl -o response.docx \
+  "https://api.abigail.app/v1/openclaw/download/roa_abc123?token=eyJhbGci..."
+```

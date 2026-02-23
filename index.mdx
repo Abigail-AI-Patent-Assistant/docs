@@ -1,0 +1,58 @@
+---
+title: Abigail API
+description: Patent prosecution AI for developers and AI agents.
+---
+
+The Abigail API gives you programmatic access to AI-powered patent prosecution tools.
+Analyze office actions, draft response documents, and access examiner intelligence --
+all through a single REST API.
+
+## Who is this for?
+
+- **AI agent developers** building patent prosecution workflows (OpenClaw, custom agents)
+- **Law firm engineering teams** integrating AI analysis into existing docketing systems
+- **Solo practitioners** automating repetitive prosecution tasks
+
+## Endpoint overview
+
+| Endpoint | Auth | Price | Description |
+| --- | --- | --- | --- |
+| `GET /v1/openclaw/lookup/{app_number}` | None | Free | Application metadata |
+| `GET /v1/openclaw/deadlines/{app_number}` | None | Free | Response deadlines |
+| `POST /v1/openclaw/analyze` | API key | $5 | Office action analysis |
+| `POST /v1/openclaw/draft-roa` | API key | $10 | Draft response document |
+| `GET /v1/openclaw/draft-roa/status/{job_id}` | API key | Free | Poll draft status |
+| `GET /v1/openclaw/examiner/{name}` | API key | $1 | Examiner intelligence |
+| `GET /v1/openclaw/download/{job_id}` | Token | Free | Download DOCX |
+
+## Quick example
+
+```bash
+# Free: Look up a patent application
+curl https://api.abigail.app/v1/openclaw/lookup/17200011
+
+# Paid: Analyze an office action
+curl -X POST https://api.abigail.app/v1/openclaw/analyze \
+  -H "X-API-Key: abi_sk_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "application_number": "17200011",
+    "office_action_text": "Claims 1-5 are rejected...",
+    "office_action_type": "CTNF"
+  }'
+```
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get your API key and make your first call in 2 minutes.
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    API key creation and security best practices.
+  </Card>
+  <Card title="Glass Box" icon="eye" href="/concepts/glass-box">
+    Understand AI transparency metadata in every response.
+  </Card>
+  <Card title="API Reference" icon="code">
+    Full endpoint documentation with interactive playground. See the API Reference tab.
+  </Card>
+</CardGroup>

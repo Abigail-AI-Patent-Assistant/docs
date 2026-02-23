@@ -1,0 +1,31 @@
+---
+title: Analyze Office Action
+openapi: "openapi.json POST /v1/openclaw/analyze"
+---
+
+This is the core endpoint. Submit the full text of a USPTO office action and receive
+a structured analysis with claim-by-claim breakdown, rejection bases, prior art mapping,
+and strategic recommendations.
+
+Every response includes [Glass Box](/concepts/glass-box) transparency metadata.
+
+## Typical workflow
+
+1. Call `/lookup/{app_number}` to get the examiner name
+2. Call `/analyze` with the office action text
+3. Use the returned `analysis_id` to call `/draft-roa`
+
+## Office action types
+
+| Code | Meaning |
+| --- | --- |
+| `CTNF` | Non-final rejection (default) |
+| `CTFR` | Final rejection |
+| `CTED` | Restriction requirement |
+| `CTRS` | Requirement for information |
+
+## Examiner intelligence
+
+When `include_examiner_intel` is `true` (default), the analysis includes examiner
+behavior patterns that inform the strategy recommendations. Set to `false` to skip
+this step and reduce processing time.

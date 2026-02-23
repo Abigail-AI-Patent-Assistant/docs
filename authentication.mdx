@@ -1,0 +1,94 @@
+---
+title: Authentication
+description: API key creation, usage, and security.
+---
+
+The Abigail API uses two authentication methods:
+
+| Method | Used for | Header |
+| --- | --- | --- |
+| **API Key** | OpenClaw endpoints (`/v1/openclaw/*`) | `X-API-Key` |
+| **Clerk JWT** | Developer portal (`/api/v1/developer/*`) | `Authorization: Bearer <token>` |
+
+## API Key Authentication
+
+All paid endpoints require an API key in the `X-API-Key` header.
+
+### Key format
+
+```
+abi_sk_{32_hex_characters}
+```
+
+Example: `abi_sk_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`
+
+### Using your key
+
+```bash
+curl -H "X-API-Key: abi_sk_your_key_here" \
+  https://api.abigail.app/v1/openclaw/analyze
+```
+
+```python
+import httpx
+
+resp = httpx.post(
+    "https://api.abigail.app/v1/openclaw/analyze",
+    headers={"X-API-Key": "abi_sk_your_key_here"},
+    json={"application_number": "17200011", "office_action_text": "..."}
+)
+```
+
+### Key lifecycle
+
+1. **Create** a key at the [Developer Portal](https://abigail.app/developers)
+2. The raw key is shown **once** -- copy it immediately
+3. Only the SHA-256 hash is stored server-side
+4. **Revoke** a key anytime from the Developer Portal
+5. Revoked keys are rejected immediately
+
+### Security best practices
+
+<Warning>
+  Never commit API keys to source control. Use environment variables or a secrets manager.
+</Warning>
+
+- Store keys in environment variables: `ABIGAIL_API_KEY=abi_sk_...`
+- Rotate keys periodically
+- Use separate keys for development and production
+- Revoke keys immediately if compromised
+
+## Error responses
+
+### Missing key
+
+```json
+{
+  "error": true,
+  "error_code": "missing_api_key",
+  "message": "Missing X-API-Key header.",
+  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app/developers and provide it to you."
+}
+```
+
+### Invalid key
+
+```json
+{
+  "error": true,
+  "error_code": "invalid_api_key",
+  "message": "API key invalid.",
+  "agent_suggestion": "The API key is invalid. Ask the user to generate a new key at https://abigail.app/developers"
+}
+```
+
+### Revoked key
+
+```json
+{
+  "error": true,
+  "error_code": "revoked_api_key",
+  "message": "API key revoked.",
+  "agent_suggestion": "The API key is revoked. Ask the user to generate a new key at https://abigail.app/developers"
+}
+```

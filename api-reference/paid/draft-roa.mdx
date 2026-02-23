@@ -1,0 +1,37 @@
+---
+title: Draft Response Document
+openapi: "openapi.json POST /v1/openclaw/draft-roa"
+---
+
+Submits an asynchronous job to generate a Response to Office Action (ROA) document
+in DOCX format. The job runs in the background via Celery workers.
+
+## Async workflow
+
+1. **Submit** this endpoint -- returns a `job_id` immediately
+2. **Poll** `/draft-roa/status/{job_id}` until `status` is `complete`
+3. **Download** the DOCX via the signed URL in the status response
+
+## Strategy selections
+
+Override the AI-recommended strategy for specific claims:
+
+```json
+{
+  "strategy_selections": {
+    "claim_1": "amend_narrow",
+    "claim_2": "argue_distinction",
+    "claim_5": "cancel"
+  }
+}
+```
+
+| Strategy | Meaning |
+| --- | --- |
+| `amend_narrow` | Narrow the claim with additional limitations |
+| `argue_distinction` | Argue that the claim is already distinct from prior art |
+| `cancel` | Cancel the claim |
+| `argue_unexpected_results` | Argue unexpected results (for 103 rejections) |
+
+If `strategy_selections` is empty or omitted, the AI recommendations from the
+analysis are used.

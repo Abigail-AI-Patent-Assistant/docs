@@ -1,0 +1,15 @@
+---
+title: Lookup Application
+openapi: "openapi.json GET /v1/openclaw/lookup/{application_number}"
+---
+
+<Note>
+  This endpoint is free and requires no authentication.
+</Note>
+
+Application numbers are normalized automatically -- slashes, commas, and spaces are removed.
+All of these formats work:
+
+- `17200011`
+- `17/200,011`
+- `17 200 011`

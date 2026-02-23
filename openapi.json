@@ -1,0 +1,536 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Abigail API",
+    "description": "Patent prosecution AI API. Analyze office actions, draft response documents, and access examiner intelligence.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Abigail Support",
+      "url": "https://abigail.app",
+      "email": "support@abigail.app"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.abigail.app",
+      "description": "Production"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/v1/openclaw/lookup/{application_number}": {
+      "get": {
+        "tags": ["Free Endpoints"],
+        "summary": "Lookup Application",
+        "operationId": "lookup_application",
+        "description": "Look up a patent application by number. Returns metadata including title, status, filing date, examiner, and art unit.\n\nNo authentication required. Application numbers are normalized automatically (slashes, commas, and spaces are removed).",
+        "parameters": [
+          {
+            "name": "application_number",
+            "in": "path",
+            "required": true,
+            "description": "USPTO application number. Formats accepted: `17200011`, `17/200,011`, `17200011`.",
+            "schema": { "type": "string" },
+            "example": "17200011"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApplicationLookup" },
+                "example": {
+                  "application_number": "17200011",
+                  "invention_title": "SYSTEMS AND METHODS FOR AI-ASSISTED PATENT PROSECUTION",
+                  "status": "pending",
+                  "filing_date": "2025-01-15",
+                  "examiner_name": "SMITH, JOHN A",
+                  "current_art_unit": "3621",
+                  "response_deadline": "2026-06-01",
+                  "critical_deadline_date": null,
+                  "critical_deadline_correspondence_id": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": true,
+                  "error_code": "app_not_found",
+                  "message": "Application 17200011 not found in USPTO Patent Center.",
+                  "agent_suggestion": "Application not found. Verify the number format (17200011 or 17/200,011) and check for typos."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/deadlines/{application_number}": {
+      "get": {
+        "tags": ["Free Endpoints"],
+        "summary": "Get Deadlines",
+        "operationId": "get_deadlines",
+        "description": "Get response and critical deadlines for a patent application.\n\nNo authentication required.",
+        "parameters": [
+          {
+            "name": "application_number",
+            "in": "path",
+            "required": true,
+            "description": "USPTO application number.",
+            "schema": { "type": "string" },
+            "example": "17200011"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deadlines found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeadlinesResponse" },
+                "example": {
+                  "application_number": "17200011",
+                  "deadlines": {
+                    "response_deadline": "2026-06-01",
+                    "critical_deadline_date": "2026-09-01",
+                    "critical_deadline_correspondence_id": "corr_abc123"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/analyze": {
+      "post": {
+        "tags": ["Paid Endpoints"],
+        "summary": "Analyze Office Action",
+        "operationId": "analyze_office_action",
+        "description": "Run AI-powered analysis of a USPTO office action. Identifies rejection bases, analyzes each claim, and provides strategic recommendations.\n\nReturns Glass Box metadata showing which AI experts were invoked, model versions, and confidence scores.\n\n**Pricing:** $5 per analysis.",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "description": "Your Abigail API key (format: `abi_sk_...`).",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnalyzeRequest" },
+              "example": {
+                "application_number": "17200011",
+                "office_action_text": "Claims 1-5 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Smith (US 2024/0001234)...",
+                "office_action_type": "CTNF",
+                "include_examiner_intel": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis complete",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalysisResponse" },
+                "example": {
+                  "analysis_id": "ana_a1b2c3d4e5f6",
+                  "application_number": "17200011",
+                  "rejection_type": "CTNF",
+                  "claim_analyses": [
+                    {
+                      "claim_number": 1,
+                      "status": "rejected",
+                      "basis": "102(a)(1)",
+                      "prior_art": ["US 2024/0001234"],
+                      "recommendation": "amend_narrow"
+                    }
+                  ],
+                  "glass_box": {
+                    "experts_invoked": ["claim_analyst", "prior_art_mapper", "examiner_profiler"],
+                    "citations_verified": true,
+                    "confidence_scores": { "claim_analyst": 0.92 },
+                    "model_versions": { "claim_analyst": "claude-sonnet-4-20250514" },
+                    "elapsed_seconds": 12.4
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": true,
+                  "error_code": "missing_api_key",
+                  "message": "Missing X-API-Key header.",
+                  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app/developers and provide it to you."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/draft-roa": {
+      "post": {
+        "tags": ["Paid Endpoints"],
+        "summary": "Draft Response Document",
+        "operationId": "draft_roa",
+        "description": "Submit an asynchronous job to draft a Response to Office Action (ROA) document in DOCX format.\n\nReturns a `job_id` immediately. Poll `/draft-roa/status/{job_id}` for progress and download URL.\n\n**Pricing:** $10 per draft.",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DraftRoaRequest" },
+              "example": {
+                "application_number": "17200011",
+                "analysis_id": "ana_a1b2c3d4e5f6",
+                "strategy_selections": {
+                  "claim_1": "amend_narrow",
+                  "claim_2": "argue_distinction"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job submitted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DraftJobSubmitted" },
+                "example": {
+                  "job_id": "roa_abc123def456",
+                  "status": "queued",
+                  "poll_url": "/v1/openclaw/draft-roa/status/roa_abc123def456"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/draft-roa/status/{job_id}": {
+      "get": {
+        "tags": ["Paid Endpoints"],
+        "summary": "Poll Draft Status",
+        "operationId": "poll_draft_status",
+        "description": "Check the status of an ROA drafting job. When complete, includes a signed download URL (valid for 1 hour).",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "roa_abc123def456"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DraftJobStatus" },
+                "examples": {
+                  "in_progress": {
+                    "summary": "Job in progress",
+                    "value": {
+                      "job_id": "roa_abc123def456",
+                      "status": "in_progress",
+                      "progress": 45,
+                      "current_step": "Drafting claim amendments"
+                    }
+                  },
+                  "complete": {
+                    "summary": "Job complete",
+                    "value": {
+                      "job_id": "roa_abc123def456",
+                      "status": "complete",
+                      "progress": 100,
+                      "download_url": "/v1/openclaw/download/roa_abc123def456?token=eyJhbGci..."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/examiner/{examiner_name}": {
+      "get": {
+        "tags": ["Paid Endpoints"],
+        "summary": "Examiner Intelligence",
+        "operationId": "examiner_intelligence",
+        "description": "Get an examiner intelligence profile including allowance rates, technology preferences, and historical behavior patterns.\n\nExaminer name format: `LASTNAME, FIRSTNAME M` (URL-encoded).\n\n**Pricing:** $1 per lookup.",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "examiner_name",
+            "in": "path",
+            "required": true,
+            "description": "Examiner name in `LASTNAME, FIRSTNAME M` format. URL-encode spaces and commas.",
+            "schema": { "type": "string" },
+            "example": "SMITH%2C%20JOHN%20A"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Examiner profile found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExaminerProfile" },
+                "example": {
+                  "examiner_name": "SMITH, JOHN A",
+                  "art_unit": "3621",
+                  "allowance_rate": 0.34,
+                  "avg_actions_to_allowance": 2.8,
+                  "top_rejection_bases": ["102(a)(1)", "103"],
+                  "interview_success_rate": 0.67,
+                  "total_cases_analyzed": 142
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Examiner not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/openclaw/download/{job_id}": {
+      "get": {
+        "tags": ["Downloads"],
+        "summary": "Download DOCX",
+        "operationId": "download_docx",
+        "description": "Download a completed ROA document in DOCX format.\n\nAuthenticated via a signed URL token (included in the draft status response). No API key needed -- the token IS the auth.\n\nTokens expire after 1 hour. Re-poll `/draft-roa/status/{job_id}` for a fresh URL.",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "description": "Signed JWT download token from the draft status response.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DOCX file ready for download",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired download token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for paid endpoints. Create at https://abigail.app/developers"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Clerk JWT for developer portal endpoints."
+      }
+    },
+    "schemas": {
+      "ApplicationLookup": {
+        "type": "object",
+        "properties": {
+          "application_number": { "type": "string" },
+          "invention_title": { "type": "string" },
+          "status": { "type": "string" },
+          "filing_date": { "type": "string", "format": "date" },
+          "examiner_name": { "type": "string" },
+          "current_art_unit": { "type": "string" },
+          "response_deadline": { "type": "string", "format": "date", "nullable": true },
+          "critical_deadline_date": { "type": "string", "format": "date", "nullable": true },
+          "critical_deadline_correspondence_id": { "type": "string", "nullable": true }
+        }
+      },
+      "DeadlinesResponse": {
+        "type": "object",
+        "properties": {
+          "application_number": { "type": "string" },
+          "deadlines": {
+            "type": "object",
+            "properties": {
+              "response_deadline": { "type": "string", "format": "date", "nullable": true },
+              "critical_deadline_date": { "type": "string", "format": "date", "nullable": true },
+              "critical_deadline_correspondence_id": { "type": "string", "nullable": true }
+            }
+          }
+        }
+      },
+      "AnalyzeRequest": {
+        "type": "object",
+        "required": ["application_number", "office_action_text"],
+        "properties": {
+          "application_number": { "type": "string", "description": "USPTO application number." },
+          "office_action_text": { "type": "string", "description": "Full text of the office action." },
+          "office_action_type": { "type": "string", "default": "CTNF", "description": "Office action type code. Common: CTNF (non-final), CTFR (final), CTED (restriction)." },
+          "include_examiner_intel": { "type": "boolean", "default": true, "description": "Include examiner intelligence in the analysis." }
+        }
+      },
+      "AnalysisResponse": {
+        "type": "object",
+        "properties": {
+          "analysis_id": { "type": "string", "description": "Unique analysis identifier. Use this for follow-up draft-roa calls." },
+          "application_number": { "type": "string" },
+          "rejection_type": { "type": "string" },
+          "claim_analyses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "claim_number": { "type": "integer" },
+                "status": { "type": "string" },
+                "basis": { "type": "string" },
+                "prior_art": { "type": "array", "items": { "type": "string" } },
+                "recommendation": { "type": "string" }
+              }
+            }
+          },
+          "glass_box": { "$ref": "#/components/schemas/GlassBox" }
+        }
+      },
+      "GlassBox": {
+        "type": "object",
+        "description": "Transparency metadata showing AI decision provenance.",
+        "properties": {
+          "experts_invoked": { "type": "array", "items": { "type": "string" }, "description": "List of AI expert modules that participated in the analysis." },
+          "citations_verified": { "type": "boolean", "description": "Whether prior art citations were verified against source documents." },
+          "confidence_scores": { "type": "object", "additionalProperties": { "type": "number" } },
+          "model_versions": { "type": "object", "additionalProperties": { "type": "string" } },
+          "elapsed_seconds": { "type": "number" }
+        }
+      },
+      "DraftRoaRequest": {
+        "type": "object",
+        "required": ["application_number", "analysis_id"],
+        "properties": {
+          "application_number": { "type": "string" },
+          "analysis_id": { "type": "string", "description": "Analysis ID from a prior /analyze call." },
+          "strategy_selections": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Per-claim strategy overrides. Keys: claim numbers, values: strategy codes (amend_narrow, argue_distinction, cancel)." }
+        }
+      },
+      "DraftJobSubmitted": {
+        "type": "object",
+        "properties": {
+          "job_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued"] },
+          "poll_url": { "type": "string", "description": "URL to poll for job status." }
+        }
+      },
+      "DraftJobStatus": {
+        "type": "object",
+        "properties": {
+          "job_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["queued", "in_progress", "complete", "failed"] },
+          "progress": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "current_step": { "type": "string", "nullable": true },
+          "download_url": { "type": "string", "nullable": true, "description": "Signed download URL. Only present when status is complete. Valid for 1 hour." }
+        }
+      },
+      "ExaminerProfile": {
+        "type": "object",
+        "properties": {
+          "examiner_name": { "type": "string" },
+          "art_unit": { "type": "string" },
+          "allowance_rate": { "type": "number", "description": "Historical allowance rate (0-1)." },
+          "avg_actions_to_allowance": { "type": "number" },
+          "top_rejection_bases": { "type": "array", "items": { "type": "string" } },
+          "interview_success_rate": { "type": "number" },
+          "total_cases_analyzed": { "type": "integer" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Structured error with agent_suggestion for LLM consumers.",
+        "properties": {
+          "error": { "type": "boolean", "const": true },
+          "error_code": { "type": "string", "description": "Machine-readable error code." },
+          "message": { "type": "string", "description": "Human-readable error message." },
+          "agent_suggestion": { "type": "string", "description": "Actionable suggestion for AI agents consuming this API." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Abigail API",
+  "colors": {
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/glass-box",
+              "concepts/agent-suggestions",
+              "concepts/rate-limits"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "openapi.json",
+        "groups": [
+          {
+            "group": "Free Endpoints",
+            "pages": [
+              "api-reference/free/lookup",
+              "api-reference/free/deadlines"
+            ]
+          },
+          {
+            "group": "Paid Endpoints",
+            "pages": [
+              "api-reference/paid/analyze",
+              "api-reference/paid/draft-roa",
+              "api-reference/paid/poll-status",
+              "api-reference/paid/examiner"
+            ]
+          },
+          {
+            "group": "Downloads",
+            "pages": [
+              "api-reference/downloads/docx"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Developer Portal",
+          "href": "https://abigail.app/developers",
+          "icon": "key"
+        },
+        {
+          "anchor": "Status",
+          "href": "https://status.abigail.app",
+          "icon": "signal"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@abigail.app"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get API Key",
+      "href": "https://abigail.app/developers"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/salt-holdings",
+      "linkedin": "https://linkedin.com/company/abigail-app"
+    }
+  },
+  "api": {
+    "baseUrl": "https://api.abigail.app",
+    "auth": {
+      "method": "key",
+      "name": "X-API-Key"
+    }
+  }
+}

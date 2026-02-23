@@ -1,0 +1,76 @@
+---
+title: Glass Box Transparency
+description: Every analysis includes metadata showing how AI decisions were made.
+---
+
+Every response from the `/analyze` endpoint includes a `glass_box` object that provides
+full transparency into the AI decision-making process.
+
+## Why Glass Box?
+
+Patent prosecution requires trust. Attorneys need to verify AI-generated analysis before
+filing with the USPTO. Glass Box metadata lets you:
+
+- See which AI expert modules participated in the analysis
+- Verify that prior art citations were checked against source documents
+- Assess confidence levels per expert
+- Track model versions for reproducibility
+- Measure processing time
+
+## Structure
+
+```json
+{
+  "glass_box": {
+    "experts_invoked": ["claim_analyst", "prior_art_mapper", "examiner_profiler"],
+    "citations_verified": true,
+    "confidence_scores": {
+      "claim_analyst": 0.92,
+      "prior_art_mapper": 0.87
+    },
+    "model_versions": {
+      "claim_analyst": "claude-sonnet-4-20250514",
+      "prior_art_mapper": "claude-sonnet-4-20250514"
+    },
+    "elapsed_seconds": 12.4
+  }
+}
+```
+
+## Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `experts_invoked` | string[] | AI expert modules that ran during analysis |
+| `citations_verified` | boolean | Whether prior art citations were verified against source text |
+| `confidence_scores` | object | Per-expert confidence (0-1 scale) |
+| `model_versions` | object | LLM model version used by each expert |
+| `elapsed_seconds` | number | Total processing time |
+
+## Expert modules
+
+| Expert | Role |
+| --- | --- |
+| `claim_analyst` | Parses claims, identifies rejected claims, maps rejection bases |
+| `prior_art_mapper` | Maps prior art references to specific claim limitations |
+| `examiner_profiler` | Analyzes examiner behavior patterns (when `include_examiner_intel` is true) |
+| `strategy_recommender` | Recommends per-claim response strategies |
+
+## Using Glass Box in your agent
+
+AI agents should check Glass Box data to calibrate trust:
+
+```python
+result = analyze_office_action(...)
+glass_box = result["glass_box"]
+
+# Only proceed with high-confidence analysis
+if glass_box["confidence_scores"].get("claim_analyst", 0) < 0.7:
+    # Flag for human review
+    notify_user("Low confidence analysis -- recommend manual review")
+
+# Verify citations were checked
+if not glass_box["citations_verified"]:
+    # Citations may be hallucinated
+    notify_user("Citations not verified against source documents")
+```
