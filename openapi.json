@@ -120,7 +120,7 @@
         "tags": ["Paid Endpoints"],
         "summary": "Analyze Office Action",
         "operationId": "analyze_office_action",
-        "description": "Run AI-powered analysis of a USPTO office action. Identifies rejection bases, analyzes each claim, and provides strategic recommendations.\n\nReturns Glass Box metadata showing which AI experts were invoked, model versions, and confidence scores.\n\n**Pricing:** $5 per analysis.",
+        "description": "Run AI-powered analysis of a USPTO office action. Identifies rejection bases, analyzes each claim, and provides strategic recommendations.\n\nReturns Glass Box metadata showing which AI experts were invoked, model versions, and confidence scores.\n\n**Billing:** Token-based. Input and output tokens are metered against your credit balance.",
         "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
@@ -184,7 +184,7 @@
                   "error": true,
                   "error_code": "missing_api_key",
                   "message": "Missing X-API-Key header.",
-                  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app/developers and provide it to you."
+                  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app and provide it to you."
                 }
               }
             }
@@ -197,7 +197,7 @@
         "tags": ["Paid Endpoints"],
         "summary": "Draft Response Document",
         "operationId": "draft_roa",
-        "description": "Submit an asynchronous job to draft a Response to Office Action (ROA) document in DOCX format.\n\nReturns a `job_id` immediately. Poll `/draft-roa/status/{job_id}` for progress and download URL.\n\n**Pricing:** $10 per draft.",
+        "description": "Submit an asynchronous job to draft a Response to Office Action (ROA) document in DOCX format.\n\nReturns a `job_id` immediately. Poll `/draft-roa/status/{job_id}` for progress and download URL.\n\n**Billing:** Token-based usage for AI generation, plus a $49 document export fee deducted from credits when downloading the DOCX.",
         "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
@@ -307,7 +307,7 @@
         "tags": ["Paid Endpoints"],
         "summary": "Examiner Intelligence",
         "operationId": "examiner_intelligence",
-        "description": "Get an examiner intelligence profile including allowance rates, technology preferences, and historical behavior patterns.\n\nExaminer name format: `LASTNAME, FIRSTNAME M` (URL-encoded).\n\n**Pricing:** $1 per lookup.",
+        "description": "Get an examiner intelligence profile including allowance rates, technology preferences, and historical behavior patterns.\n\nExaminer name format: `LASTNAME, FIRSTNAME M` (URL-encoded).\n\n**Billing:** Token-based. Metered against your credit balance.",
         "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
@@ -402,7 +402,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-Key",
-        "description": "API key for paid endpoints. Create at https://abigail.app/developers"
+        "description": "API key for paid endpoints. Create in your account Settings at https://abigail.app"
       },
       "BearerAuth": {
         "type": "http",

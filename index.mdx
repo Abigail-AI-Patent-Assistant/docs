@@ -15,14 +15,14 @@ all through a single REST API.
 
 ## Endpoint overview
 
-| Endpoint | Auth | Price | Description |
+| Endpoint | Auth | Billing | Description |
 | --- | --- | --- | --- |
 | `GET /v1/openclaw/lookup/{app_number}` | None | Free | Application metadata |
 | `GET /v1/openclaw/deadlines/{app_number}` | None | Free | Response deadlines |
-| `POST /v1/openclaw/analyze` | API key | $5 | Office action analysis |
-| `POST /v1/openclaw/draft-roa` | API key | $10 | Draft response document |
+| `POST /v1/openclaw/analyze` | API key | Token-based | Office action analysis |
+| `POST /v1/openclaw/draft-roa` | API key | Token-based + export fee | Draft response document |
 | `GET /v1/openclaw/draft-roa/status/{job_id}` | API key | Free | Poll draft status |
-| `GET /v1/openclaw/examiner/{name}` | API key | $1 | Examiner intelligence |
+| `GET /v1/openclaw/examiner/{name}` | API key | Token-based | Examiner intelligence |
 | `GET /v1/openclaw/download/{job_id}` | Token | Free | Download DOCX |
 
 ## Quick example

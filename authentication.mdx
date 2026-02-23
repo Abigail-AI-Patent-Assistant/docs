@@ -41,10 +41,10 @@ resp = httpx.post(
 
 ### Key lifecycle
 
-1. **Create** a key at the [Developer Portal](https://abigail.app/developers)
+1. **Create** a key from the API Keys section in your account Settings
 2. The raw key is shown **once** -- copy it immediately
 3. Only the SHA-256 hash is stored server-side
-4. **Revoke** a key anytime from the Developer Portal
+4. **Revoke** a key anytime from Settings
 5. Revoked keys are rejected immediately
 
 ### Security best practices
@@ -67,7 +67,7 @@ resp = httpx.post(
   "error": true,
   "error_code": "missing_api_key",
   "message": "Missing X-API-Key header.",
-  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app/developers and provide it to you."
+  "agent_suggestion": "This endpoint requires an Abigail API key. The user must create one at https://abigail.app and provide it to you."
 }
 ```
 
@@ -78,7 +78,7 @@ resp = httpx.post(
   "error": true,
   "error_code": "invalid_api_key",
   "message": "API key invalid.",
-  "agent_suggestion": "The API key is invalid. Ask the user to generate a new key at https://abigail.app/developers"
+  "agent_suggestion": "The API key is invalid. Ask the user to generate a new key at https://abigail.app"
 }
 ```
 
@@ -89,6 +89,6 @@ resp = httpx.post(
   "error": true,
   "error_code": "revoked_api_key",
   "message": "API key revoked.",
-  "agent_suggestion": "The API key is revoked. Ask the user to generate a new key at https://abigail.app/developers"
+  "agent_suggestion": "The API key is revoked. Ask the user to generate a new key at https://abigail.app"
 }
 ```

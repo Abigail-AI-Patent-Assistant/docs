@@ -63,14 +63,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Developer Portal",
-          "href": "https://abigail.app/developers",
-          "icon": "key"
-        },
-        {
-          "anchor": "Status",
-          "href": "https://status.abigail.app",
-          "icon": "signal"
+          "anchor": "Main Site",
+          "href": "https://abigail.app",
+          "icon": "globe"
         }
       ]
     }
@@ -88,8 +83,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Get API Key",
-      "href": "https://abigail.app/developers"
+      "label": "Get Started",
+      "href": "/quickstart"
     }
   },
   "footer": {

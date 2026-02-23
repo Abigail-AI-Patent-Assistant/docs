@@ -1,23 +1,127 @@
 ---
-title: Rate Limits
-description: Request limits and throttling behavior.
+title: Billing & Rate Limits
+description: Credit-based billing, usage tracking, and rate limits.
 ---
 
-The Abigail API enforces rate limits to ensure fair usage and service stability.
+The Abigail API uses a **credit-based billing system**. You purchase credits, and
+usage is deducted in real-time based on token consumption. LLM usage is never blocked --
+only document exports are credit-gated.
 
-## Limits
+## How billing works
+
+1. Purchase a credit package (or receive $25 welcome credits on signup)
+2. Every API call that uses AI consumes tokens (input + output)
+3. Token costs are deducted from your credit balance automatically
+4. Every response includes balance headers so you can track spending
+
+## Token pricing
+
+| Service Type | Rate |
+| --- | --- |
+| Standard Input | $50.00 per 1M tokens |
+| Standard Output | $200.00 per 1M tokens |
+
+A typical `/analyze` call processes ~2,000 input tokens and ~1,500 output tokens,
+costing approximately $0.40 per analysis.
+
+### Model multiplier
+
+Your account has a model version setting (default 1.0x) that multiplies base token
+prices. Higher-capability models may have higher multipliers.
+
+## Credit packages
+
+| Package | Price | Credits | Bonus |
+| --- | --- | --- | --- |
+| Starter | $25 | $25 | -- |
+| Professional | $100 | $100 | +$10 |
+| Business | $500 | $500 | +$75 |
+| Enterprise | $2,000 | $2,000 | +$400 |
+
+Custom amounts are also supported (1:1 credits, no bonus).
+
+New accounts receive **$25 in welcome credits** to get started.
+
+## Document export pricing
+
+Document exports (DOCX downloads) are **credit-gated** -- the API returns HTTP 402
+if your balance is insufficient.
+
+| Document Type | Price |
+| --- | --- |
+| OA Response | $49.00 |
+| IDS | $9.00 |
+| Form | $5.00 |
+| Drawing | $5.00 |
+
+<Warning>
+  Document exports are the only operations that block on insufficient credits.
+  All LLM-based operations (analyze, examiner lookup) always complete regardless
+  of balance.
+</Warning>
+
+## What is free?
+
+These operations are never billed:
+
+- `GET /v1/openclaw/lookup/{app_number}` -- application metadata
+- `GET /v1/openclaw/deadlines/{app_number}` -- response deadlines
+- `GET /v1/openclaw/draft-roa/status/{job_id}` -- polling draft status
+- `GET /v1/openclaw/download/{job_id}` -- downloading a completed DOCX (the draft
+  submission is billed, not the download)
+
+## Usage tracking headers
+
+Every response from authenticated endpoints includes these headers:
+
+```
+X-Credit-Balance: 142.50
+X-Balance-Status: healthy
+X-Usage-Requests-Today: 23
+X-Usage-Requests-Hour: 5
+```
+
+### Balance status thresholds
+
+| Status | Balance | Meaning |
+| --- | --- | --- |
+| `healthy` | > $25 | Normal operation |
+| `low` | $10 -- $25 | Consider purchasing more credits |
+| `very_low` | $5 -- $10 | Running low |
+| `critical` | < $5 | Nearly depleted |
+
+When balance is `low` or below, responses also include:
+
+```
+X-Purchase-Prompt: true
+X-Purchase-Message: Your credit balance is low. Purchase more credits to continue using AI features.
+```
+
+## Handling 402 responses
+
+When a document export is blocked for insufficient credits:
+
+```json
+{
+  "error": true,
+  "error_code": "insufficient_credits",
+  "message": "Insufficient credits for OA Response export ($49.00 required).",
+  "agent_suggestion": "The user needs to purchase more credits before exporting this document. Current balance is insufficient."
+}
+```
+
+Your agent should inform the user to purchase credits and retry.
+
+## Rate limits
 
 | Tier | Rate | Burst |
 | --- | --- | --- |
 | Free endpoints | 60 requests/minute | 10 requests/second |
-| API key (paid) | 120 requests/minute | 20 requests/second |
+| API key (authenticated) | 120 requests/minute | 20 requests/second |
 
-Rate limits are applied per API key (for authenticated requests) or per IP address
-(for free endpoints).
+Rate limits are per API key (authenticated) or per IP (free endpoints).
 
-## Rate limit headers
-
-Every response includes rate limit headers:
+### Rate limit headers
 
 ```
 X-RateLimit-Limit: 120
@@ -25,20 +129,7 @@ X-RateLimit-Remaining: 117
 X-RateLimit-Reset: 1708732800
 ```
 
-## Handling 429 responses
-
-When rate limited, the API returns HTTP 429:
-
-```json
-{
-  "error": true,
-  "error_code": "rate_limited",
-  "message": "Rate limit exceeded. Try again in 3 seconds.",
-  "agent_suggestion": "You are sending requests too quickly. Wait 3 seconds before retrying."
-}
-```
-
-Implement exponential backoff in your agent:
+### Handling 429 responses
 
 ```python
 import time
@@ -54,18 +145,3 @@ def call_with_retry(url, headers, json_body, max_retries=3):
         return resp
     raise Exception("Rate limit exceeded after retries")
 ```
-
-## Billing
-
-Paid endpoints use Stripe metered billing. You are charged per successful call:
-
-| Endpoint | Price |
-| --- | --- |
-| `/v1/openclaw/analyze` | $5 per call |
-| `/v1/openclaw/draft-roa` | $10 per call |
-| `/v1/openclaw/examiner/{name}` | $1 per call |
-
-Free endpoints (`/lookup`, `/deadlines`) and status polling (`/draft-roa/status`) are
-never billed.
-
-Failed requests (4xx, 5xx) are not billed.
