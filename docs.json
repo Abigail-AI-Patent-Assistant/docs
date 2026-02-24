@@ -33,7 +33,7 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "openapi.json",
+        "openapi": "https://api.abigail.app/v1/openclaw/openapi.json",
         "groups": [
           {
             "group": "Free Endpoints",
