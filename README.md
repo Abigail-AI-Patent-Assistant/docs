@@ -37,11 +37,11 @@ Every error response includes an `agent_suggestion` field written for you -- act
 
 ## What This Repo Contains
 
-This is the source for Abigail's API documentation, built with [Mintlify](https://mintlify.com) and deployed automatically on push to `main`.
+This is the source for Abigail's API documentation, and deployed automatically on push to `main`.
 
 ```
 .
-|-- docs.json              # Mintlify configuration (nav, theme, API settings)
+|-- docs.json              # Configuration (nav, theme, API settings)
 |-- openapi.json           # OpenAPI 3.1 spec for all endpoints
 |-- index.mdx              # Landing page
 |-- quickstart.mdx         # 5-step getting started guide
