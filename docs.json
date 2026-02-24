@@ -66,6 +66,16 @@
           "anchor": "Main Site",
           "href": "https://abigail.app",
           "icon": "globe"
+        },
+        {
+          "anchor": "API Keys",
+          "href": "https://abigail.app/settings?tab=api-keys",
+          "icon": "key"
+        },
+        {
+          "anchor": "Status",
+          "href": "https://abigail.app/status",
+          "icon": "signal"
         }
       ]
     }
