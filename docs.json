@@ -22,6 +22,15 @@
             ]
           },
           {
+            "group": "MCP Connector",
+            "pages": [
+              "mcp/guide",
+              "mcp/connect",
+              "mcp/tools",
+              "mcp/parity"
+            ]
+          },
+          {
             "group": "Concepts",
             "pages": [
               "concepts/glass-box",
@@ -32,28 +41,17 @@
         ]
       },
       {
-        "tab": "API Reference",
-        "openapi": "https://api.abigail.app/v1/openclaw/openapi.json",
+        "tab": "Legacy REST API",
         "groups": [
           {
-            "group": "Free Endpoints",
+            "group": "Retired Endpoints",
             "pages": [
               "api-reference/free/lookup",
-              "api-reference/free/deadlines"
-            ]
-          },
-          {
-            "group": "Paid Endpoints",
-            "pages": [
+              "api-reference/free/deadlines",
               "api-reference/paid/analyze",
               "api-reference/paid/draft-roa",
               "api-reference/paid/poll-status",
-              "api-reference/paid/examiner"
-            ]
-          },
-          {
-            "group": "Downloads",
-            "pages": [
+              "api-reference/paid/examiner",
               "api-reference/downloads/docx"
             ]
           }
@@ -93,8 +91,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Get Started",
-      "href": "/quickstart"
+      "label": "Connect via MCP",
+      "href": "https://docs.abigail.app/mcp/connect"
     }
   },
   "footer": {

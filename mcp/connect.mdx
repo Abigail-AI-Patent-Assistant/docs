@@ -1,0 +1,195 @@
+---
+title: Connect via MCP
+description: Add Abigail to ChatGPT, Claude, or Cursor as a Model Context Protocol connector.
+---
+
+Abigail runs a Model Context Protocol (MCP) server. Point any MCP capable assistant at
+one URL and it gains 45 patent prosecution tools: docket, deadlines, office action
+analysis, the guided response wizard, USPTO forms, and agent workflows.
+
+```
+https://mcp.abigail.app/mcp
+```
+
+This is the recommended integration path for every platform. It replaces the older
+REST developer API, which is retired.
+
+<Warning>
+  The MCP server does **not** accept `abi_sk_` API keys. It uses OAuth 2.1. Your
+  assistant performs the sign in for you, so there is no key to copy or store. See
+  [Authentication](/authentication) for the full comparison.
+</Warning>
+
+## What the connector is
+
+A stateless proxy. It holds no database of its own. It translates a tool call from your
+assistant into a request against `api.abigail.app` carrying the signed in user's token,
+then returns the result. Consequences worth knowing:
+
+- Everything you do through MCP happens against the same account, the same docket, and
+  the same credit balance as the web app at abigail.app.
+- Work created through an assistant is visible in the web app immediately, and the
+  reverse is also true.
+- Every authenticated tool call is written to the account's audit log.
+
+## Add the connector
+
+<Tabs>
+  <Tab title="Claude">
+    1. Open **Settings**, then **Connectors**, then **Add custom connector**.
+    2. Paste `https://mcp.abigail.app/mcp` as the server URL.
+    3. Save, then open a chat and ask for something that needs your account, for example
+       "show my docket".
+    4. Claude discovers the authorization server, registers itself, and opens the Abigail
+       sign in page. Approve it once.
+
+    Leave the optional Client ID and Client Secret fields empty. The server supports
+    dynamic client registration, so no pre issued credentials are needed.
+  </Tab>
+  <Tab title="ChatGPT">
+    1. In **Settings**, then **Connectors**, choose to add an MCP server.
+    2. Enter `https://mcp.abigail.app/mcp`.
+    3. Complete the Abigail sign in when prompted.
+
+    The server is built for the Apps SDK and advertises tool annotations, so ChatGPT can
+    tell read only tools from ones that write.
+
+    <Note>
+      Credit purchases are not available inside ChatGPT, per OpenAI's policy on digital
+      goods. Tools that report a balance work normally, and top ups happen at
+      [abigail.app](https://abigail.app/settings?tab=billing).
+    </Note>
+  </Tab>
+  <Tab title="Cursor and other clients">
+    Any client that speaks streamable HTTP MCP works. A typical entry:
+
+    ```json
+    {
+      "mcpServers": {
+        "abigail": {
+          "url": "https://mcp.abigail.app/mcp"
+        }
+      }
+    }
+    ```
+
+    Your client must support the OAuth 2.1 authorization code flow with PKCE. Clients
+    without OAuth support cannot use the server at all: the handshake itself is answered
+    with `HTTP 401` and the sign in challenge.
+  </Tab>
+  <Tab title="Custom integration">
+    Speak MCP over streamable HTTP directly. The transport is stateless, so a single POST
+    per JSON-RPC message is enough. Every message needs a token, so a call without one is
+    answered with the challenge:
+
+    ```bash
+    curl -s -D - -o /dev/null https://mcp.abigail.app/mcp \
+      -H "Content-Type: application/json" \
+      -H "Accept: application/json, text/event-stream" \
+      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+
+    HTTP/1.1 401 Unauthorized
+    www-authenticate: Bearer resource_metadata="https://mcp.abigail.app/.well-known/oauth-protected-resource"
+    ```
+
+    Add `-H "Authorization: Bearer <token>"` once you hold a token from the flow below.
+  </Tab>
+</Tabs>
+
+## How sign in works
+
+The server implements the MCP authorization spec, so a compliant client discovers
+everything it needs on its own. The chain, if you are building a client and want to
+follow it manually:
+
+<Steps>
+  <Step title="A request comes back unauthorized">
+    A request with no token, or one whose token is within ten minutes of expiring, is
+    answered with `HTTP 401` and a `WWW-Authenticate` header pointing at the protected
+    resource metadata document. If a token expires mid session the same challenge arrives
+    in band on the tool result, carrying `_meta["mcp/www_authenticate"]`.
+
+    ```json
+    {
+      "content": [{ "type": "text", "text": "Authentication required. Please sign in to use this tool." }],
+      "_meta": {
+        "mcp/www_authenticate": [
+          "Bearer resource_metadata=\"https://mcp.abigail.app/.well-known/oauth-protected-resource\""
+        ]
+      },
+      "isError": true
+    }
+    ```
+  </Step>
+  <Step title="Fetch the protected resource metadata (RFC 9728)">
+    `GET https://mcp.abigail.app/.well-known/oauth-protected-resource` names the
+    authorization server:
+
+    ```json
+    {
+      "resource": "https://mcp.abigail.app",
+      "authorization_servers": ["https://api.abigail.app"],
+      "scopes_supported": ["full_access"],
+      "bearer_methods_supported": ["header"]
+    }
+    ```
+  </Step>
+  <Step title="Fetch the authorization server metadata (RFC 8414)">
+    `GET https://api.abigail.app/.well-known/oauth-authorization-server` returns the
+    endpoints:
+
+    | Purpose | Endpoint |
+    | --- | --- |
+    | Register a client | `https://api.abigail.app/oauth/register` |
+    | Authorize | `https://api.abigail.app/oauth/authorize` |
+    | Exchange or refresh a token | `https://api.abigail.app/oauth/token` |
+    | Read the signed in identity | `https://api.abigail.app/oauth/userinfo` |
+    | Revoke | `https://api.abigail.app/oauth/revoke` |
+
+    Supported grants are `authorization_code` and `refresh_token`. The only code
+    challenge method is `S256`. Client authentication may be `client_secret_post`,
+    `client_secret_basic`, or `none` for public clients.
+  </Step>
+  <Step title="Register dynamically (RFC 7591)">
+    POST to the registration endpoint to obtain a client ID. No manual onboarding, no
+    pre shared secret, no email to support.
+  </Step>
+  <Step title="Run the authorization code flow with PKCE">
+    The user signs in to Abigail and approves. Your client receives a code, exchanges it
+    at the token endpoint, and gets a Bearer token scoped `full_access`.
+  </Step>
+  <Step title="Retry the tool call">
+    Send the token in the `Authorization` header. The proxy forwards it to the backend,
+    which enforces tenant isolation on every read and write.
+  </Step>
+</Steps>
+
+## What works before signing in
+
+Nothing. Every request to `/mcp` requires a valid Bearer token, including the protocol
+handshake and the tool listing. Without one the server answers `HTTP 401` and a
+`WWW-Authenticate` header naming the protected resource metadata document, which is the
+signal a compliant client uses to start the OAuth flow described above automatically. You
+sign in once; the client handles the rest.
+
+`lookup_application` used to answer anonymously and no longer does. Deadlines never did,
+because they are computed from your docket with the MPEP verified calculator.
+
+The two discovery documents stay open, since a client has to read them before it can hold
+a token: `GET /.well-known/oauth-protected-resource` on the MCP server, and
+`GET /.well-known/oauth-authorization-server` on the API. `GET /health` is open too.
+
+## Billing and limits
+
+MCP usage draws on the same credit balance as the web app, priced identically. AI usage
+is deducted per token, and document exports carry a fixed fee. Call `check_credits` at any
+point to read the balance, or see [Billing and rate limits](/concepts/rate-limits).
+
+<CardGroup cols={2}>
+  <Card title="Tool reference" icon="wrench" href="/mcp/tools">
+    All 45 tools, what each one needs, and what it maps to in the web app.
+  </Card>
+  <Card title="Match the web app" icon="arrows-left-right" href="/mcp/parity">
+    Reproduce every Abigail screen as a tool sequence, plus the known gaps.
+  </Card>
+</CardGroup>
