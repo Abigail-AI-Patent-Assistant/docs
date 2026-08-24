@@ -1,0 +1,164 @@
+---
+title: Match the web app
+description: Reproduce the full Abigail experience through MCP, screen by screen, with the gaps stated plainly.
+---
+
+A common question from integrators: can an assistant give my users the same experience as
+abigail.app, or is MCP a read only feed on the side?
+
+It is the same product. The MCP server is a proxy in front of the identical backend the
+web app calls, so an assistant is not working against a reduced copy of Abigail. What
+changes is the surface, not the system.
+
+| | Web app | Through MCP |
+| --- | --- | --- |
+| Account and docket | Same | Same |
+| Tenant isolation | Enforced server side | Enforced server side, identically |
+| Credit balance and pricing | Same | Same |
+| Audit trail | Written | Written, tagged as an external MCP call |
+| Work created | Visible in both | Visible in both, immediately |
+
+A case added by an assistant appears on My Docket. A draft generated in the web wizard is
+downloadable through MCP. There is no sync step and no second copy of the data.
+
+## Screen by screen
+
+Every major surface of the web app, and the tool or sequence that reproduces it.
+
+| Web app | Tools |
+| --- | --- |
+| My Docket | `get_docket`, `get_docket_metrics` |
+| Add to My Docket | `add_case`, then `sync_case` |
+| Alerts | `get_alerts` |
+| Case header and metadata | `get_case_details` |
+| Deadline panel | `get_case_deadline`, or `get_deadlines` |
+| Claims and rejections | `get_claim_analysis` |
+| File wrapper | `get_prosecution_history`, then `download_document` |
+| Prior art search | `search_prior_art` |
+| Examiner intelligence | `get_examiner_intel` |
+| Analytics | `get_portfolio_summary`, `get_analytics_summary` |
+| Draft ROA wizard, all steps | The six `roa_wizard_*` tools in order |
+| Forms | `list_form_templates`, `create_form_draft`, `autofill_form`, `submit_form_for_review`, `generate_form_pdf` |
+| Agent queue | `get_agent_dashboard`, `get_pending_reviews`, `approve_agent_draft` |
+| Filing | `prepare_filing_package`, then `record_filing_receipt` |
+| Settings and billing | `get_user_settings`, `check_credits`, read only |
+
+## Recipe: the morning docket review
+
+What a user does in three clicks on the web, as one turn in an assistant.
+
+<Steps>
+  <Step title="Read the docket">
+    `get_docket` for the case list, `get_docket_metrics` for the counts.
+  </Step>
+  <Step title="Surface what is urgent">
+    `get_alerts`, then `get_case_deadline` for any case the user asks about.
+  </Step>
+  <Step title="Open one case">
+    `get_case_details` for the header, `get_claim_analysis` for what the examiner
+    actually rejected and why.
+  </Step>
+</Steps>
+
+## Recipe: a complete office action response
+
+This is the flow that matters most, and it is fully available. The wizard is a state
+machine on the backend, so the six tools drive the same steps as the web wizard and
+produce the same document.
+
+<Steps>
+  <Step title="Start the wizard">
+    `roa_wizard_start` with the application number. Returns parsed claims and the
+    rejections to answer.
+
+    Show the claim text verbatim at this point. It is legal text.
+  </Step>
+  <Step title="Run the experts">
+    `roa_wizard_run_experts` returns a job id. Poll `roa_wizard_expert_status` until it
+    completes, then present the proposed strategies per rejection.
+  </Step>
+  <Step title="Let the user choose">
+    `roa_wizard_select_strategies` with one selection per rejection. This is the step
+    where the assistant earns its place: it can explain each option in conversation,
+    which the web wizard cannot.
+  </Step>
+  <Step title="Generate and deliver">
+    `roa_wizard_generate`, then poll `roa_wizard_status` for the download link. The
+    export fee is deducted the same way it is on the web.
+  </Step>
+</Steps>
+
+Where no human is picking strategies, `generate_roa`, `check_roa_status`, and
+`download_roa` do the same job unattended.
+
+## Recipe: a form, then a filing package
+
+<Steps>
+  <Step title="Pick a template">
+    `list_form_templates`, then `create_form_draft`.
+  </Step>
+  <Step title="Fill it from the case">
+    `autofill_form` populates from case context. `get_form_status` reads back the values
+    so the assistant can show them for confirmation.
+  </Step>
+  <Step title="Review, then produce the PDF">
+    `submit_form_for_review`, and after approval `generate_form_pdf`.
+  </Step>
+  <Step title="Assemble the filing">
+    `prepare_filing_package` returns the documents, the fee calculation, and step by step
+    Patent Center instructions. The human files. `record_filing_receipt` stores the
+    confirmation number.
+  </Step>
+</Steps>
+
+## Four things that make it feel like the product
+
+<AccordionGroup>
+  <Accordion title="Reproduce claim text verbatim">
+    Never summarise, condense, or skip a claim. Preserve strikethrough as deleted text,
+    underline as inserted text, every status identifier, the numbering, and the
+    dependency structure. Show cancelled and withdrawn claims too. Add analysis after the
+    complete text, never in place of it. Long output should be batched, never truncated.
+  </Accordion>
+  <Accordion title="Follow next_actions instead of dead ending">
+    When a tool cannot find a case it returns `next_actions` naming the tool to call next
+    with arguments already filled in, typically `add_case`. Offering that is the
+    difference between "I could not find it" and the guided path the web app gives.
+  </Accordion>
+  <Accordion title="Poll, never estimate">
+    Expert analysis and document generation are asynchronous. Poll the status tool. Never
+    infer that a job finished, and never compute a USPTO deadline yourself. Deadlines come
+    from the calculator that applies weekend and federal holiday rollover. A wrong date
+    here can abandon an application.
+  </Accordion>
+  <Accordion title="Deep link for what MCP does not do">
+    `get_user_settings` returns links back to abigail.app for profile, notifications, and
+    billing. Hand the user the link rather than pretending the change happened.
+  </Accordion>
+</AccordionGroup>
+
+## What is not available through MCP
+
+Stated plainly so you can scope around it. These exist in the web app and have no tool
+behind them today:
+
+| Web app capability | Status |
+| --- | --- |
+| New application drafting | Not exposed. Spec, claims, and drawings authoring is web only |
+| Trademarks | Not exposed |
+| Claim editing in the response editor | Not exposed. MCP reads claims and generates documents, it does not host the editor |
+| Library management | Search only. Uploading and organising documents is web only |
+| Settings changes | Read only, by design. Deep links are returned instead |
+| Credit purchase | Web only |
+
+One further limit worth knowing: Abigail never submits to USPTO Patent Center on a
+user's behalf. Filing is always a human action.
+
+<CardGroup cols={2}>
+  <Card title="Connect" icon="plug" href="/mcp/connect">
+    Setup and the OAuth handshake.
+  </Card>
+  <Card title="Tool reference" icon="wrench" href="/mcp/tools">
+    All 45 tools with their requirements.
+  </Card>
+</CardGroup>

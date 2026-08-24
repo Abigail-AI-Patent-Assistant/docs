@@ -1,0 +1,149 @@
+---
+title: Tool reference
+description: All 45 MCP tools, what each one requires, and the web app feature behind it.
+---
+
+The MCP server exposes 45 tools. Every one is a thin proxy onto the same backend the web
+app uses, so the data, the tenant scoping, and the billing are identical.
+
+The **Sign in** column says whether a token is required. Read only tools are annotated as
+such in the protocol, so assistants can distinguish a lookup from a write without guessing.
+
+<Note>
+  Prefer `get_claim_analysis` over `analyze_application`: for almost every application the
+  analysis has already been run, and `get_claim_analysis` returns it directly.
+</Note>
+
+## Docket and cases
+
+Everything on **My Docket** and the case header.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `get_docket` | Yes | Paginated case list, the docket table |
+| `get_docket_metrics` | Yes | Counts and totals shown above the docket |
+| `add_case` | Yes | Adds an application to the docket, same as Add to My Docket |
+| `sync_case` | Yes | Pulls the latest USPTO file wrapper for a case |
+| `get_case_details` | Yes | Full case metadata panel |
+| `get_case_deadline` | Yes | Response deadline for one tracked case |
+| `get_alerts` | Yes | The alerts and notifications list |
+
+## Lookup and deadlines
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `lookup_application` | Yes | Public USPTO metadata for any application: title, examiner, art unit, status, filing date. The data is public; the call is not, because every `/mcp` request needs a token |
+| `get_deadlines` | Yes | Deadline with extensions and fees, from the MPEP verified calculator, computed from your docket. A call without a valid token never reaches the tool: the server answers `HTTP 401` with the sign in challenge |
+
+## Analysis and research
+
+The case workspace: claims, rejections, prior art, prosecution history, analytics.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `get_claim_analysis` | Yes | Parsed claims with amendment markup plus rejections. The primary analysis tool |
+| `analyze_application` | Yes | Runs the analysis pipeline from scratch. Only when the above returns nothing |
+| `get_examiner_intel` | Yes | Examiner allowance rates and prosecution patterns |
+| `search_prior_art` | Yes | Prior art search across the library |
+| `get_prosecution_history` | Yes | The file wrapper document list |
+| `download_document` | Yes | A time limited download URL for one prosecution document |
+| `get_portfolio_summary` | Yes | Portfolio analytics summary |
+| `get_analytics_summary` | Yes | Case stats, upcoming deadlines, overdue items |
+
+<Note>
+  `get_claim_analysis` returns claim text with amendment markup preserved: strikethrough
+  for deleted text, underline for inserted text, and status identifiers such as
+  `[Currently Amended]` or `[Withdrawn]`. Patent claims are legal text. The server
+  instructs connected assistants to reproduce them verbatim and never to summarise or
+  omit claims. If you are building your own client, honour the same rule.
+</Note>
+
+## Draft ROA wizard
+
+The guided Response to Office Action flow, exposed as the same ordered state machine the
+web wizard drives. Call them in sequence.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `roa_wizard_start` | Yes | Step 1, parse claims and rejections |
+| `roa_wizard_run_experts` | Yes | Step 2, launch AI expert analysis, returns a job id |
+| `roa_wizard_expert_status` | Yes | Poll step 2 until strategies are ready |
+| `roa_wizard_select_strategies` | Yes | Step 3, save one strategy per rejection |
+| `roa_wizard_generate` | Yes | Generate the DOCX, returns a job id |
+| `roa_wizard_status` | Yes | Poll generation, returns the download link |
+
+A headless path exists for when no human is choosing strategies:
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `generate_roa` | Yes | Fire and forget generation for one application |
+| `check_roa_status` | Yes | Poll that job |
+| `download_roa` | Yes | Download URL for the finished document |
+
+## USPTO forms
+
+The Forms page, end to end.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `list_form_templates` | Yes | Available USPTO templates |
+| `create_form_draft` | Yes | New draft from a template |
+| `autofill_form` | Yes | Fill the draft from case context |
+| `get_form_status` | Yes | Read draft state and current field values |
+| `submit_form_for_review` | Yes | Send the draft for human approval |
+| `generate_form_pdf` | Yes | Final PDF from an approved draft |
+
+## Agent workflows
+
+The agent queue, where Abigail prepares work and a human approves it.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `classify_document` | Yes | Classify a USPTO communication into a response type |
+| `start_agent_workflow` | Yes | Open an autonomous workflow for an application |
+| `get_agent_status` | Yes | State of one workflow |
+| `get_pending_reviews` | Yes | Everything waiting on a human |
+| `approve_agent_draft` | Yes | Approve a prepared draft |
+| `get_agent_dashboard` | Yes | Dashboard counts |
+
+## Filing
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `prepare_filing_package` | Yes | Assembles documents and fees with Patent Center instructions |
+| `check_submission_status` | Yes | Whether a saved Patent Center submission was filed |
+| `record_filing_receipt` | Yes | Store the confirmation number after filing |
+| `get_delegation_status` | Yes | Whether USPTO delegation is configured |
+| `configure_delegation` | Yes | Configure delegation for assisted filing |
+
+<Warning>
+  Abigail never transmits to USPTO Patent Center on its own. `prepare_filing_package`
+  produces the package and the instructions. A human signs in to Patent Center and files.
+  `record_filing_receipt` closes the loop afterwards.
+</Warning>
+
+## Account
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `check_credits` | Yes | Credit balance and usage |
+| `get_user_settings` | Yes | Profile, notification preferences, credits, and deep links to change them |
+
+Settings are read only through MCP by design. `get_user_settings` returns links back to
+abigail.app for anything that changes account state.
+
+## Guided follow ups
+
+Some tools attach a `next_actions` array to their response, naming the tool to call next
+and a display string for the user. A "case not found" result, for example, comes back
+suggesting `add_case` with the application number already filled in. Surfacing these turns
+a dead end into the same guided path the web app offers.
+
+<CardGroup cols={2}>
+  <Card title="Connect" icon="plug" href="/mcp/connect">
+    Setup and the OAuth handshake.
+  </Card>
+  <Card title="Match the web app" icon="arrows-left-right" href="/mcp/parity">
+    Screen by screen recipes and the honest gap list.
+  </Card>
+</CardGroup>

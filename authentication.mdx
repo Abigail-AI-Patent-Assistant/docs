@@ -1,18 +1,54 @@
 ---
 title: Authentication
-description: API key creation, usage, and security.
+description: How the MCP connector signs in, and where the older API key still applies.
 ---
 
-The Abigail API uses two authentication methods:
+<Warning>
+  **The MCP server does not accept `abi_sk_` API keys.** They are separate credentials for
+  separate surfaces, and mixing them up is the most common integration mistake. Sending an
+  API key as a Bearer token to the MCP server fails at the proxy.
+</Warning>
 
-| Method | Used for | Header |
+| Credential | Used for | How it travels |
 | --- | --- | --- |
-| **API Key** | OpenClaw endpoints (`/v1/openclaw/*`) | `X-API-Key` |
+| **OAuth 2.1 Bearer token** | The MCP server at `mcp.abigail.app` | `Authorization: Bearer <token>`, obtained by your assistant |
+| **API Key** (`abi_sk_`) | The retired `/v1/openclaw/*` REST endpoints | `X-API-Key` |
 | **Clerk JWT** | Developer portal (`/api/v1/developer/*`) | `Authorization: Bearer <token>` |
 
-## API Key Authentication
+## OAuth for MCP (current)
 
-All paid endpoints require an API key in the `X-API-Key` header.
+This is the credential for every new integration. You do not create, copy, paste, or store
+anything: a compatible assistant discovers the authorization server, registers itself, and
+walks the user through sign in.
+
+| Purpose | Endpoint |
+| --- | --- |
+| Protected resource metadata | `https://mcp.abigail.app/.well-known/oauth-protected-resource` |
+| Authorization server metadata | `https://api.abigail.app/.well-known/oauth-authorization-server` |
+| Dynamic client registration | `https://api.abigail.app/oauth/register` |
+| Authorize | `https://api.abigail.app/oauth/authorize` |
+| Token and refresh | `https://api.abigail.app/oauth/token` |
+| Identity | `https://api.abigail.app/oauth/userinfo` |
+| Revoke | `https://api.abigail.app/oauth/revoke` |
+
+Grants are `authorization_code` and `refresh_token`, the code challenge method is `S256`,
+and the scope is `full_access`. Client authentication may be `client_secret_post`,
+`client_secret_basic`, or `none` for public clients. The full walkthrough, including the
+challenge your client receives on an unauthenticated call, is in
+[Connect via MCP](/mcp/connect).
+
+To end an assistant's access, revoke it from your Abigail account. The token stops working
+immediately.
+
+## API Key Authentication (legacy)
+
+<Note>
+  The `/v1/openclaw/*` endpoints this key authenticates were retired on 2026-07-18 and
+  return `404`. This section is kept for existing integrations and reference. Keys are
+  still issued from Settings for internal use.
+</Note>
+
+Paid legacy endpoints required an API key in the `X-API-Key` header.
 
 ### Key format
 
@@ -20,7 +56,7 @@ All paid endpoints require an API key in the `X-API-Key` header.
 abi_sk_{32_hex_characters}
 ```
 
-Example: `abi_sk_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`
+Example: `abi_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 ### Using your key
 
