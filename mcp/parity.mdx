@@ -144,12 +144,15 @@ behind them today:
 
 | Web app capability | Status |
 | --- | --- |
-| New application drafting | Not exposed. Spec, claims, and drawings authoring is web only |
+| Drawings authoring | Web only. The canvas is not headless |
 | Trademarks | Not exposed |
-| Claim editing in the response editor | Not exposed. MCP reads claims and generates documents, it does not host the editor |
-| Library management | Search only. Uploading and organising documents is web only |
 | Settings changes | Read only, by design. Deep links are returned instead |
 | Credit purchase | Web only |
+| Batch library upload | Web only. MCP uploads one file per call, up to 10 MB |
+
+Three capabilities moved off this list and onto the tool reference: claim amendment
+drafting and response assembly, new application drafting and section editing, and single
+file library upload.
 
 One further limit worth knowing: Abigail never submits to USPTO Patent Center on a
 user's behalf. Filing is always a human action.
@@ -159,6 +162,6 @@ user's behalf. Filing is always a human action.
     Setup and the OAuth handshake.
   </Card>
   <Card title="Tool reference" icon="wrench" href="/mcp/tools">
-    All 45 tools with their requirements.
+    All 55 tools with their requirements.
   </Card>
 </CardGroup>

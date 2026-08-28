@@ -1,9 +1,9 @@
 ---
 title: Tool reference
-description: All 45 MCP tools, what each one requires, and the web app feature behind it.
+description: All 55 MCP tools, what each one requires, and the web app feature behind it.
 ---
 
-The MCP server exposes 45 tools. Every one is a thin proxy onto the same backend the web
+The MCP server exposes 55 tools. Every one is a thin proxy onto the same backend the web
 app uses, so the data, the tenant scoping, and the billing are identical.
 
 The **Sign in** column says whether a token is required. Read only tools are annotated as
@@ -121,6 +121,37 @@ The agent queue, where Abigail prepares work and a human approves it.
   produces the package and the instructions. A human signs in to Patent Center and files.
   `record_filing_receipt` closes the loop afterwards.
 </Warning>
+
+## Response drafting
+
+The response editor on a case: claim amendments and the assembled response document.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `list_amendment_drafts` | Yes | The saved claim amendment drafts, read only |
+| `save_amendment_draft` | Yes | Creates or updates the amendment draft for one claim. Always recorded as an attorney edit, so the prior round baseline resolves the same way it does in the editor |
+| `delete_amendment_draft` | Yes | Deletes one draft. Annotated destructive |
+| `assemble_response_document` | Yes | Assembles the response from the saved work product. Consumes credits, like the editor button. Answers `402` with the shortfall when the balance is short |
+
+## New applications
+
+Drafting a new application, the same lane as the web drafting page.
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `start_new_application` | Yes | Opens a drafting session and returns the session id the other tools key on |
+| `save_application_draft` | Yes | Saves the full draft document for a session |
+| `get_application_draft` | Yes | Reads the current draft and its version |
+| `edit_application_section` | Yes | One compare and set edit to a single section. A stale version comes back as `409` carrying the version the server expected, so a retry is exact |
+| `download_application_docx` | Yes | Time limited download URL for an export that was already purchased. Never starts a charge; export once from the web app first |
+
+Drawings are authored on the canvas in the web app and have no MCP tools.
+
+## Library upload
+
+| Tool | Sign in | Does |
+| --- | --- | --- |
+| `upload_library_document` | Yes | Uploads one file (PDF, DOCX, DOC, TXT, MD) up to 10 MB, base64 encoded. Stored, text extracted, and indexed for search exactly as a web upload. Anything larger, or a batch, goes through the library page |
 
 ## Account
 
