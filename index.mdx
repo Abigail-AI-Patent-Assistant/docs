@@ -8,7 +8,7 @@ prosecution: office action analysis, response drafting, USPTO forms, examiner
 intelligence, and docket management.
 
 The integration path is the **Model Context Protocol**. Point a compatible assistant at
-one URL and it gains 45 tools backed by the same system that runs abigail.app.
+one URL and it gains 55 tools backed by the same system that runs abigail.app.
 
 ```
 https://mcp.abigail.app/mcp
@@ -38,23 +38,18 @@ https://mcp.abigail.app/mcp
 
 ## Quick example
 
-List the tool catalogue with no credentials at all:
-
-```bash
-curl -s https://mcp.abigail.app/mcp \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
-```
-
-Account data requires an OAuth sign in, which a compatible assistant performs for you.
+Every request to `/mcp` requires a valid Bearer token, including the protocol
+handshake and the tool listing. Without one the server answers `HTTP 401` and a
+`WWW-Authenticate` header naming the protected resource metadata document, which
+is the signal a compliant client uses to start the OAuth flow automatically. You
+sign in once with your Abigail account; the client handles the rest.
 
 <CardGroup cols={2}>
   <Card title="Connect via MCP" icon="plug" href="/mcp/connect">
     Add Abigail to ChatGPT, Claude, or Cursor in a couple of minutes.
   </Card>
   <Card title="Tool reference" icon="wrench" href="/mcp/tools">
-    All 45 tools, what each needs, and what it maps to.
+    All 55 tools, what each needs, and what it maps to.
   </Card>
   <Card title="Match the web app" icon="arrows-left-right" href="/mcp/parity">
     Reproduce every Abigail screen as a tool sequence, gaps included.
