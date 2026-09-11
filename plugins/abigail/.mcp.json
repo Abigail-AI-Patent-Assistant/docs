@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "abigail": {
+      "type": "http",
+      "url": "https://mcp.abigail.app/mcp"
+    }
+  }
+}

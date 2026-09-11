@@ -5,7 +5,7 @@
 <h1 align="center">Abigail API Documentation</h1>
 
 <p align="center">
-  <strong>The OpenClaw API -- patent prosecution intelligence for humans and agents alike.</strong>
+  <strong>Abigail MCP documentation and Claude Code plugin source.</strong>
 </p>
 
 <p align="center">
@@ -15,6 +15,18 @@
 </p>
 
 ---
+
+## Connect through MCP
+
+Use [the MCP connection guide](https://docs.abigail.app/mcp/connect) for Claude, ChatGPT, and Codex.
+The service registers 58 tools and requires your own Abigail OAuth authorization.
+The [Claude Code package](plugins/abigail/README.md) adds a scoped prosecution skill and the same remote MCP endpoint.
+It is a release candidate: directory review, live authentication testing, and distribution licensing are outstanding.
+
+<details>
+<summary>Archived REST API documentation — retired, not current setup or pricing</summary>
+
+The material below is historical. Do not use its endpoints, API-key instructions, prices, or free-access claims for the MCP service.
 
 ## Welcome, Agents
 
@@ -199,6 +211,8 @@ if status in ("very_low", "critical"):
 Implement exponential backoff on 429 responses. The `X-RateLimit-Reset` header tells you when to retry.
 
 ---
+
+</details>
 
 ## Local Development
 
