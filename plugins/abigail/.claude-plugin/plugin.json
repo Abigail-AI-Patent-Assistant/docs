@@ -1,0 +1,17 @@
+{
+  "name": "abigail",
+  "version": "0.1.0",
+  "description": "Use your Abigail account for docket review and guided patent prosecution workflows.",
+  "author": {
+    "name": "Abigail",
+    "email": "support@abigail.app"
+  },
+  "homepage": "https://docs.abigail.app/mcp/connect",
+  "repository": "https://github.com/Abigail-AI-Patent-Assistant/docs",
+  "license": "UNLICENSED",
+  "keywords": [
+    "patent",
+    "prosecution",
+    "mcp"
+  ]
+}
