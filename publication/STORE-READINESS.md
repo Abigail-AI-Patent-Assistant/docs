@@ -1,7 +1,7 @@
 # Both-directory release candidate
 
 Updated October 18, 2026. Candidate artifacts, not submission or approval receipts.
-Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head d9f47cc6377a0f54ed36bc7bbd5f1ba50ec4eec1).
+Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head552b05546334264874b0e040489401a3eb4dca9a).
 Publication source: https://github.com/Abigail-AI-Patent-Assistant/docs/pull/3 (draft).
 
 ## Publisher and listing copy
@@ -70,7 +70,7 @@ Do not promise editorial promotion or assume old Team-plan-only requirements.
 
 | Gate | Required evidence | Current state |
 |---|---|---|
-| Frozen release | Product and docs merged SHAs, serving MCP/backend/worker/frontend revisions | Incomplete; product PR open, exact-head required CI pending |
+| Frozen release | Product and docs merged SHAs, serving MCP/backend/worker/frontend revisions | Incomplete; product PR open, exact-head required CI passed; independent final plan/code review open |
 | ROA | Source-faithful case, decisions visible in browser, canonical draft save/reopen, usable latest DOCX, charge/refusal receipts | Local regression only |
 | NewApp | Same-session full specification/claims/drawings, scoped persisted references/search log, conflict refusal, inspected full package | Private writes implemented in product PR; real local Storage/SQL/queue/vector/browser readback and exact source download pass. Full generated package/provider acceptance remains open |
 | Clients | Browser, Claude and OpenAI each read/edit/readback/reverse continuation/download on same build | Partial local browser readback/download only; native Claude/Codex final-build roundtrips blocked until approved runtime access |
@@ -99,22 +99,50 @@ and the intended fresh-user outcome each require their own retained receipt.
 
 ## October 18 integrated engineering receipts
 
-Product runtime at6f2668e3 passed525 backend tests across23 modules; final
-d9f47cc637 has identical runtime/tests and only removes two stale suppression
-inventory entries. Frontend References/download suite29PASS; isolated real
-PostgreSQL migration/RLS/session RPC1PASS. Actual local registered save, private
-Storage/SQL, offline embedding/Qdrant and consumers pass. Separate real
-Redis/Celery Library delivery and reviewed attribution manifest proofs pass.
-Authenticated local browser reopened two owned sessions and downloaded exact
-source text as .txt. These proofs do not establish full wizard/native-client
-acceptance, final CI, production migration, deployment or legacy attribution.
-Independent review remains unverified under the no-fan-out instruction.
+Product PR5697 head552b05546334264874b0e040489401a3eb4dca9a passed all
+8 required Agent Gate jobs including Summary in run39166430265:
+https://github.com/rhahn28/abigail-v3/actions/runs/39166430265
+Full backend CI:33570passed/265skipped. Required frontend typecheck/lint/Jest/build,
+Python guards, diff guards and actual PostgreSQL RPC schema smoke all passed.
+Skipped optional duplicate CI jobs are not counted as passes.
 
-The existing review3 ZIP remains byte-for-byte unchanged (seven files), SHA256
-0dfba24150577c037eb7445a0c2f41e60f2cc9aabd047910759ec0c8717542a9.
-Proprietary LICENSE SHA256
-761bcbdbcd3f3b09b9736041c9a1bc887c1a6b40e871a98ae0683bb7d9a327f6.
-Rebuild only if bundled files change; this handoff is outside the ZIP.
+Exact-head local24module regression714PASS/0skip/0baseline includes the expanded
+189case checklist module with valid owned, orphan and foreign-draft links.
+Prior d9 CI failure8/33462PASS/265SKIP is retained in the audit; its test fake
+rejected strict queries and omitted genuine claim bindings. The repair changes
+only test+plan files, leaving runtime byte-identical to real local proofs.
+Frontend reference/download suite29PASS; isolated PostgreSQL migration/RLS/RPC1PASS.
+Actual local registered save/private Storage/SQL/offline Qdrant and consumer
+proof, separate actual Redis/Celery Library delivery, reviewed attribution
+manifest and authenticated two-session browser/exact source.txt download passed.
+These are not full generated-wizard, hosted native-client or production outcomes.
+
+Production migration dependency hashes and review-only execution sequence are in
+the audit's production-release-plan.md and production-migration-file-hashes.json,
+and summarized in product PR5697. Historical session ownership is only a candidate
+until corroborated or explicitly attributed. Unresolved/conflicting records and
+missing original bytes remain explicit; no production attribution was executed.
+Independent final plan/code review is UNVERIFIED under no-fan-out.
+
+Current review4 ZIP (seven allowlisted files) SHA256:
+`9e01eac0b362e078ea047d8cc22b8ff49cc3b77d7559652a620e1c6ad22b038a`.
+Both portable schemas, Claude strict validator, exact-source/integrity/secret
+checks and fresh Mintlify build/link checks passed at package source072c4f5.
+Proprietary LICENSE SHA256 unchanged:
+`761bcbdbcd3f3b09b9736041c9a1bc887c1a6b40e871a98ae0683bb7d9a327f6`.
+NewApp is explicit in discovery metadata and acceptance scenarios. Review3 is
+historical and retained. This readiness-only update is outside the ZIP.
+
+Fresh public health, protected-resource and authorization-server metadata all
+returned HTTPS200 with expected resource/issuer origins. Serving revision and
+real user OAuth/client roundtrips were not attested by these reads.
+
+Fresh GitHub inventory also retains27 open dependency alerts:23frontend,
+2USPTOFiler,2investor-deck (19high/6medium/2low). All match vulnerable candidate
+lock entries; production runtime/build reachability and remediation disposition
+remain unverified. Full per-alert table is dependency-alert-triage.md in the
+private audit packet. No dependency changed or alert dismissed. Green CI is not
+an actual host-scanner or dependency-exposure disposition.
 
 OpenAI's current public-submission guidance requires a stable publicly reachable
 HTTPS MCP endpoint; Secure MCP Tunnel alone does not satisfy submission. Verify
@@ -129,6 +157,3 @@ publication remain separate receipts. Both portal sessions in this audit are
 sign-in gated; no scan, submission or approval is claimed.
 https://claude.com/resources/articles/build-plugins-for-claude
 
-Review4 candidate makes NewApp explicit in skill discovery and both host descriptions, and retains explicit NewApp/private-source acceptance scenarios. Bundled metadata changed; the review3 ZIP remains historical and is superseded by the newly validated review4 artifact and its retained receipt. Proprietary license unchanged.
-
-Current review4 ZIP SHA256: `9e01eac0b362e078ea047d8cc22b8ff49cc3b77d7559652a620e1c6ad22b038a`. Both portable schemas, Claude strict validation, exact seven-file allowlist/integrity and secret scan passed. This is a local review candidate; no host scanner or installation pass is claimed.
