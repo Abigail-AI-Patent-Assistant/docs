@@ -1,7 +1,7 @@
 # Both-directory release candidate
 
-Prepared October 17, 2026. Candidate artifacts, not submission or approval receipts.
-Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (draft).
+Updated October 18, 2026. Candidate artifacts, not submission or approval receipts.
+Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head d9f47cc6377a0f54ed36bc7bbd5f1ba50ec4eec1).
 Publication source: https://github.com/Abigail-AI-Patent-Assistant/docs/pull/3 (draft).
 
 ## Publisher and listing copy
@@ -70,10 +70,10 @@ Do not promise editorial promotion or assume old Team-plan-only requirements.
 
 | Gate | Required evidence | Current state |
 |---|---|---|
-| Frozen release | Product and docs merged SHAs, serving MCP/backend/worker/frontend revisions | Incomplete; product PR draft |
+| Frozen release | Product and docs merged SHAs, serving MCP/backend/worker/frontend revisions | Incomplete; product PR open, exact-head required CI pending |
 | ROA | Source-faithful case, decisions visible in browser, canonical draft save/reopen, usable latest DOCX, charge/refusal receipts | Local regression only |
-| NewApp | Same-session full specification/claims/drawings, scoped persisted references/search log, conflict refusal, inspected full package | Incomplete; private-reference writes deferred on current main |
-| Clients | Browser, Claude and OpenAI each read/edit/readback/reverse continuation/download on same build | Not accepted |
+| NewApp | Same-session full specification/claims/drawings, scoped persisted references/search log, conflict refusal, inspected full package | Private writes implemented in product PR; real local Storage/SQL/queue/vector/browser readback and exact source download pass. Full generated package/provider acceptance remains open |
+| Clients | Browser, Claude and OpenAI each read/edit/readback/reverse continuation/download on same build | Partial local browser readback/download only; native Claude/Codex final-build roundtrips blocked until approved runtime access |
 | Security | Private owner/other-user/cross-tenant negatives, wrong job/resource, expired/revoked auth, prompt injection | Local controls only; live matrix open |
 | Tools | Registered catalog vs actual positive/negative/readback matrix, no fake queued/completed/filing receipts | Matrix open |
 | Billing | Consent, credit refusal, actual ledger/provider/export/download reconciliation | Runtime reconciliation open |
@@ -96,3 +96,35 @@ charge references before retries. Keep filing and purchases separately authorize
 
 A locally valid package is a review candidate. Submission, approval, publication,
 and the intended fresh-user outcome each require their own retained receipt.
+
+## October 18 integrated engineering receipts
+
+Product runtime at6f2668e3 passed525 backend tests across23 modules; final
+d9f47cc637 has identical runtime/tests and only removes two stale suppression
+inventory entries. Frontend References/download suite29PASS; isolated real
+PostgreSQL migration/RLS/session RPC1PASS. Actual local registered save, private
+Storage/SQL, offline embedding/Qdrant and consumers pass. Separate real
+Redis/Celery Library delivery and reviewed attribution manifest proofs pass.
+Authenticated local browser reopened two owned sessions and downloaded exact
+source text as .txt. These proofs do not establish full wizard/native-client
+acceptance, final CI, production migration, deployment or legacy attribution.
+Independent review remains unverified under the no-fan-out instruction.
+
+The existing review3 ZIP remains byte-for-byte unchanged (seven files), SHA256
+0dfba24150577c037eb7445a0c2f41e60f2cc9aabd047910759ec0c8717542a9.
+Proprietary LICENSE SHA256
+761bcbdbcd3f3b09b9736041c9a1bc887c1a6b40e871a98ae0683bb7d9a327f6.
+Rebuild only if bundled files change; this handoff is outside the ZIP.
+
+OpenAI's current public-submission guidance requires a stable publicly reachable
+HTTPS MCP endpoint; Secure MCP Tunnel alone does not satisfy submission. Verify
+production OAuth/domain/auth and actual review-client access on the released
+revision. Its public-proxy/private-server guidance describes mTLS; applicability
+must be verified for the deployment rather than assumed universally.
+https://developers.openai.com/plugins/build/mcp-server
+
+Anthropic's current portal accepts a single remote MCP connector or a GitHub
+plugin bundle for developers on paid plans. Validation, review and explicit
+publication remain separate receipts. Both portal sessions in this audit are
+sign-in gated; no scan, submission or approval is claimed.
+https://claude.com/resources/articles/build-plugins-for-claude
