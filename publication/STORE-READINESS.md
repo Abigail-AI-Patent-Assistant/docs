@@ -7,7 +7,7 @@ Publication source: https://github.com/Abigail-AI-Patent-Assistant/docs/pull/3 (
 ## Publisher and listing copy
 
 Name: Abigail. Publisher: Salt Holdings, LLC. Support: support@abigail.app.
-Short description: Review your patent docket and draft prosecution documents.
+Short description: Review your patent docket and draft applications or responses.
 Long description and suggested prompts: `plugins/abigail/plugin.json`.
 Endpoint: https://mcp.abigail.app/mcp (Streamable HTTP; per-user OAuth).
 Website: https://abigail.app. Privacy: https://abigail.app/privacy.
@@ -128,3 +128,7 @@ plugin bundle for developers on paid plans. Validation, review and explicit
 publication remain separate receipts. Both portal sessions in this audit are
 sign-in gated; no scan, submission or approval is claimed.
 https://claude.com/resources/articles/build-plugins-for-claude
+
+Review4 candidate makes NewApp explicit in skill discovery and both host descriptions, and retains explicit NewApp/private-source acceptance scenarios. Bundled metadata changed; the review3 ZIP remains historical and is superseded by the newly validated review4 artifact and its retained receipt. Proprietary license unchanged.
+
+Current review4 ZIP SHA256: `9e01eac0b362e078ea047d8cc22b8ff49cc3b77d7559652a620e1c6ad22b038a`. Both portable schemas, Claude strict validation, exact seven-file allowlist/integrity and secret scan passed. This is a local review candidate; no host scanner or installation pass is claimed.

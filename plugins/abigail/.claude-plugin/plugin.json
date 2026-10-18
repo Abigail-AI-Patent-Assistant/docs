@@ -1,7 +1,7 @@
 {
   "name": "abigail",
   "version": "0.1.0",
-  "description": "Use your Abigail account for docket review and guided patent prosecution workflows.",
+  "description": "Use your Abigail account for docket review, Office Action responses, and new patent applications.",
   "author": {
     "name": "Abigail",
     "email": "support@abigail.app"

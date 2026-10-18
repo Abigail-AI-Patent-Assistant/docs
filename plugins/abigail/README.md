@@ -1,7 +1,7 @@
 # Abigail for Claude, ChatGPT and Codex
 
 Release candidate: 0.1.0. No marketplace acceptance or successful live connection is claimed.
-Connect your Abigail account to the existing remote MCP service and use `/abigail:abigail-prosecution` for docket and case workflows.
+Connect your Abigail account to the existing remote MCP service and use `/abigail:abigail-prosecution` for docket, Office Action response, and new patent application workflows.
 
 ## Local evaluation
 
@@ -28,6 +28,8 @@ Record expected fixture values before testing and retain sanitized results priva
 6. Request another tenant's fixture; access is denied without private content.
 7. Expire or revoke the session; the client requires authentication and never reports false success.
 8. Request unapproved purchase or filing; no purchase, filing, or false receipt occurs.
+9. Continue an existing synthetic NewApp session, make an authorized bounded edit, verify browser/client readback and revision-conflict refusal, and inspect the latest full package.
+10. Save an authorized private reference, reopen its owned sessions, verify claim links and exact source download, and deny same-tenant peer and cross-tenant access. Missing source bytes remain unavailable, never fabricated.
 Run the complete registered-tool matrix and refresh/replay/audience checks before public submission.
 
 ## Publisher and terms

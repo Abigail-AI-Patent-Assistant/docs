@@ -1,6 +1,6 @@
 ---
 name: abigail-prosecution
-description: Use when the user asks to review an Abigail docket or case, check prosecution status, or work through an Abigail response workflow.
+description: Use when the user asks to review an Abigail docket or case, prepare an Office Action response, or create or continue a new patent application.
 ---
 
 Use the connected Abigail MCP tools and the user's existing account.
