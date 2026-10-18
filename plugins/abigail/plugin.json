@@ -1,0 +1,41 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "abigail",
+  "version": "0.1.0",
+  "description": "Use your Abigail account for docket review and guided patent prosecution workflows.",
+  "author": {
+    "name": "Abigail",
+    "email": "support@abigail.app"
+  },
+  "homepage": "https://docs.abigail.app/mcp/connect",
+  "repository": "https://github.com/Abigail-AI-Patent-Assistant/docs",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "keywords": [
+    "patent",
+    "prosecution",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Abigail",
+        "shortDescription": "Review your patent docket and draft prosecution documents.",
+        "longDescription": "Connect your Abigail account to review cases and deadlines, prepare Office Action responses and new patent applications, and export documents for attorney review. Some actions modify saved work or incur Abigail charges; confirm the action and current cost before proceeding. Filing and purchases require separate explicit instructions.",
+        "developerName": "Salt Holdings, LLC",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://abigail.app",
+        "privacyPolicyURL": "https://abigail.app/privacy",
+        "termsOfServiceURL": "https://abigail.app/legal/terms-of-service.html",
+        "defaultPrompt": [
+          "Review my Abigail docket and identify cases needing attention.",
+          "Help me prepare an Office Action response for a case I select.",
+          "Guide me through a new patent application in Abigail."
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "endpoint": "https://mcp.abigail.app/mcp",
+  "auth": {
+    "type": "oauth",
+    "client": {
+      "mode": "dcr"
+    }
+  },
+  "note": "Portal configuration candidate. Not installed metadata, a registered app ID, or an authentication success receipt."
+}

@@ -21,7 +21,7 @@
 Use [the MCP connection guide](https://docs.abigail.app/mcp/connect) for Claude, ChatGPT, and Codex.
 The service registers 58 tools and requires your own Abigail OAuth authorization.
 The [Claude Code package](plugins/abigail/README.md) adds a scoped prosecution skill and the same remote MCP endpoint.
-It is a release candidate: directory review, live authentication testing, and distribution licensing are outstanding.
+It is a release candidate: directory review and live authentication testing are outstanding. A proprietary package license is included; service and user-content terms remain separate.
 
 <details>
 <summary>Archived REST API documentation — retired, not current setup or pricing</summary>
