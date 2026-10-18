@@ -1,7 +1,7 @@
 # Both-directory release candidate
 
 Updated October 18, 2026. Candidate artifacts, not submission or approval receipts.
-Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head552b05546334264874b0e040489401a3eb4dca9a).
+Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head 552b05546334264874b0e040489401a3eb4dca9a).
 Publication source: https://github.com/Abigail-AI-Patent-Assistant/docs/pull/3 (draft).
 
 ## Publisher and listing copy
@@ -99,7 +99,7 @@ and the intended fresh-user outcome each require their own retained receipt.
 
 ## October 18 integrated engineering receipts
 
-Product PR5697 head552b05546334264874b0e040489401a3eb4dca9a passed all
+Product PR5697 head 552b05546334264874b0e040489401a3eb4dca9a passed all
 8 required Agent Gate jobs including Summary in run39166430265:
 https://github.com/rhahn28/abigail-v3/actions/runs/39166430265
 Full backend CI:33570passed/265skipped. Required frontend typecheck/lint/Jest/build,
@@ -156,4 +156,3 @@ plugin bundle for developers on paid plans. Validation, review and explicit
 publication remain separate receipts. Both portal sessions in this audit are
 sign-in gated; no scan, submission or approval is claimed.
 https://claude.com/resources/articles/build-plugins-for-claude
-
