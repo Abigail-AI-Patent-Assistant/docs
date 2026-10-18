@@ -16,11 +16,6 @@ Claude submission must identify `plugins/abigail` and the reviewed commit; no ca
 The root `plugin.json` and `mcp.json` use Agent Plugins 1.0.0. OpenAI presentation metadata is namespaced under `com.openai`; OAuth uses discovered endpoints and dynamic client registration. The Claude-compatible manifests remain in place.
 For public OpenAI submission, use the remote HTTPS endpoint through **With MCP**; do not invent an app registration ID or copy another client's credentials. The same package supplies the prosecution skill. See [submission preparation](https://github.com/Abigail-AI-Patent-Assistant/docs/blob/codex/mcp-publication/publication/STORE-READINESS.md).
 
-## OpenAI package
-
-The root `plugin.json` and `mcp.json` use Agent Plugins 1.0.0. OpenAI presentation metadata is namespaced under `com.openai`; OAuth uses discovered endpoints and dynamic client registration. Claude-compatible manifests remain in place.
-For public OpenAI submission, use the remote HTTPS endpoint through **With MCP**; do not invent an app registration ID or copy credentials. The same package supplies the prosecution skill. See [submission preparation](https://github.com/Abigail-AI-Patent-Assistant/docs/blob/codex/mcp-publication/publication/STORE-READINESS.md).
-
 ## Acceptance scenarios — not yet executed
 
 Use a dedicated synthetic tenant and approved test budget; never real client matters.

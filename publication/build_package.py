@@ -20,6 +20,7 @@ def main():
         file = root / name
         if file.is_symlink() or not file.is_file():
             raise ValueError(f"Missing or linked package file: {name}")
+        file.read_bytes().decode("utf-8")
     for name in ("plugin", "mcp"):
         schema = json.loads((args.schema_dir / f"{name}.schema.json").read_text())
         if schema.get("$id") != f"https://agent-plugins.org/schemas/1.0.0/{name}.schema.json":
