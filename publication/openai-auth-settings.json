@@ -6,5 +6,5 @@
       "mode": "dcr"
     }
   },
-  "note": "Portal configuration candidate. Not installed metadata, a registered app ID, or an authentication success receipt."
+  "note": "Build input embedded into mcp.json by --target openai. Never a stand-alone upload or substitute for imported authentication metadata. No client registration or OAuth success claimed."
 }

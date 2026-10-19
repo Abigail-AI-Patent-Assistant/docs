@@ -1,6 +1,6 @@
 # Both-directory release candidate
 
-Updated October 18, 2026. Candidate artifacts, not submission or approval receipts.
+Updated October 19, 2026. Candidate artifacts, not submission or approval receipts.
 Product parity work: https://github.com/rhahn28/abigail-v3/pull/5697 (OPEN, protected from merge; head 552b05546334264874b0e040489401a3eb4dca9a).
 Publication source: https://github.com/Abigail-AI-Patent-Assistant/docs/pull/3 (draft).
 
@@ -36,16 +36,34 @@ commit with the reviewer packet. Rebuild after any package change.
 Current official path: https://platform.openai.com/plugins ; submit the remote
 HTTPS endpoint through **With MCP**. Public plugins are shared by ChatGPT and
 Codex. A local package install or workspace publication is not public listing.
-Set OAuth in the portal from `openai-auth-settings.json` using discovery and DCR.
-No registered app ID or client secret has been invented or embedded.
+Build **two distinct artifacts** from the canonical package source:
 
-Compatibility issue to verify in portal: OpenAI's packaging guide describes
-server `extensions.com.openai.auth`, but the published Agent Plugins 1.0.0 MCP
-schema rejects all server `extensions` (`additionalProperties: false`). This
-candidate keeps portable `mcp.json` schema-valid and records OAuth separately.
-Do not treat portable-schema validation as OpenAI scanner acceptance. If portal
-requires an auth extension in an uploaded package, use its validated export or
-resolve the schema discrepancy before submission; never silently disable OAuth.
+```sh
+python publication/build_package.py --target portable --output /absolute/path/abigail-portable.zip --schema-dir /absolute/path/cached-schemas
+python publication/build_package.py --target openai --output /absolute/path/abigail-openai.zip --schema-dir /absolute/path/cached-schemas
+PLUGIN_SCHEMA_DIR=/absolute/path/cached-schemas python -m unittest discover -s publication -p test_build_package.py
+```
+
+Use the OpenAI artifact for OpenAI preparation. The builder embeds DCR/OAuth
+under `mcpServers.abigail.extensions.com.openai.auth` in the actual ZIP's
+`mcp.json`. The sidecar JSON is build input, never a substitute for uploaded auth
+metadata. The portal reads package settings; it has no advanced OAuth editor.
+No client ID, client secret or token is embedded or invented. Discovery supplies
+endpoints and DCR registration; the private reviewer account remains separate.
+
+The portable/Claude artifact continues to pass the unchanged published portable
+schema. That schema rejects vendor MCP extensions; the OpenAI artifact instead
+passes a separate strict local contract derived from the official OpenAI DCR
+example. This is **not** an official OpenAI validator or host acceptance. Do not
+claim the emitted OpenAI MCP file passes the portable schema. Authenticate the
+portal, verify imported settings, and retain actual host scan/OAuth receipts.
+
+October19 repair hypothesis: conflating both host contracts caused auth to be
+omitted from the upload. Two reproducible targets preserve the strict portable
+contract and carry documented auth in the OpenAI artifact. RED: new package
+tests failed because --target and the auth contract were absent. Acceptance:
+inspect both actual ZIPs, require embedded DCR in OpenAI, reject missing auth,
+credentials and unknown fields, preserve identical proprietary license bytes.
 
 Pending: authenticated publisher/role; issued domain challenge and actual
 verification; endpoint registration; account/credit fixture for reviewers;
