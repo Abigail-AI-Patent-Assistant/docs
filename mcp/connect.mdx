@@ -4,7 +4,7 @@ description: Add Abigail to ChatGPT, Claude, or Cursor as a Model Context Protoc
 ---
 
 Abigail runs a Model Context Protocol (MCP) server. Point any MCP capable assistant at
-one URL and it gains 55 patent prosecution tools: docket, deadlines, office action
+one URL and it gains 58 patent prosecution tools: docket, deadlines, office action
 analysis, the guided response wizard, USPTO forms, and agent workflows.
 
 ```
@@ -47,18 +47,35 @@ then returns the result. Consequences worth knowing:
     dynamic client registration, so no pre issued credentials are needed.
   </Tab>
   <Tab title="ChatGPT">
-    1. In **Settings**, then **Connectors**, choose to add an MCP server.
-    2. Enter `https://mcp.abigail.app/mcp`.
-    3. Complete the Abigail sign in when prompted.
+    1. In **Settings**, then **Apps**, then **Advanced settings**, turn on **Developer mode**
+       (Plus, Pro, Business, and Enterprise; Business and Enterprise admins first allow
+       "Create custom MCP connectors").
+    2. In **Apps**, choose **Create**. Set Name, Description, MCP Server URL
+       `https://mcp.abigail.app/mcp`, and Authentication **OAuth**.
+    3. Acknowledge "I understand and want to continue", select **Create**, and complete the
+       Abigail sign in when prompted.
+    4. In a chat, open the plus menu, choose **Developer mode**, and pick ABIGAIL.
 
     The server is built for the Apps SDK and advertises tool annotations, so ChatGPT can
     tell read only tools from ones that write.
 
     <Note>
       Credit purchases are not available inside ChatGPT, per OpenAI's policy on digital
-      goods. Tools that report a balance work normally, and top ups happen at
-      [abigail.app](https://abigail.app/settings?tab=billing).
+      goods. Tools that report a balance work normally; credits are purchased in your
+      Abigail account at abigail.app.
     </Note>
+  </Tab>
+  <Tab title="Codex">
+    ```
+    codex mcp add abigail --url https://mcp.abigail.app/mcp
+    codex mcp login abigail
+    ```
+
+    The login command opens your browser to complete the Abigail sign in. Codex
+    registers itself with a loopback redirect and holds the resulting token for you.
+
+    Codex enforces a 60 second timeout per tool call. A long-running wizard step polls
+    its status with a separate call, so no single tool call approaches that limit.
   </Tab>
   <Tab title="Cursor and other clients">
     Any client that speaks streamable HTTP MCP works. A typical entry:
@@ -99,8 +116,9 @@ then returns the result. Consequences worth knowing:
 ## How sign in works
 
 The server implements the MCP authorization spec, so a compliant client discovers
-everything it needs on its own. The chain, if you are building a client and want to
-follow it manually:
+everything it needs on its own. During normal use, the client refreshes access tokens.
+An expired or revoked session can require you to sign in again.
+Refresh-token reuse can also require reconnecting. The chain, if you are building a client and want to follow it manually:
 
 <Steps>
   <Step title="A request comes back unauthorized">
@@ -187,7 +205,7 @@ point to read the balance, or see [Billing and rate limits](/concepts/rate-limit
 
 <CardGroup cols={2}>
   <Card title="Tool reference" icon="wrench" href="/mcp/tools">
-    All 55 tools, what each one needs, and what it maps to in the web app.
+    All 58 tools, what each one needs, and what it maps to in the web app.
   </Card>
   <Card title="Match the web app" icon="arrows-left-right" href="/mcp/parity">
     Reproduce every Abigail screen as a tool sequence, plus the known gaps.

@@ -1,0 +1,11 @@
+{
+  "endpoint": "https://mcp.abigail.app/mcp",
+  "auth": {
+    "type": "oauth",
+    "client": {
+      "mode": "dcr"
+    },
+    "resource": "https://mcp.abigail.app"
+  },
+  "note": "Build input embedded into mcp.json by --target openai. Never a stand-alone upload or substitute for imported authentication metadata. No client registration or OAuth success claimed."
+}
