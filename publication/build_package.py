@@ -9,6 +9,11 @@ import zipfile
 import jsonschema
 
 
+def canonical_text_bytes(file):
+    """All seven allowlisted files are UTF-8 text; normalize checkout newlines."""
+    return file.read_text(encoding="utf-8").encode("utf-8")
+
+
 def validate_openai_mcp(document):
     """Strict local contract for the documented OpenAI DCR example.
 
@@ -56,7 +61,7 @@ def main():
                  for name in ("mcp.json", ".mcp.json")]
     if endpoints != ["https://mcp.abigail.app/mcp"] * 2:
         raise ValueError("Unexpected public endpoint")
-    payload = {name: (root / name).read_bytes() for name in names}
+    payload = {name: canonical_text_bytes(root / name) for name in names}
     if args.target == "openai":
         settings = json.loads((Path(__file__).parent / "openai-auth-settings.json").read_text())
         if settings["endpoint"] != endpoints[0]:

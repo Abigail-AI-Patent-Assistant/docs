@@ -65,6 +65,13 @@ tests failed because --target and the auth contract were absent. Acceptance:
 inspect both actual ZIPs, require embedded DCR in OpenAI, reject missing auth,
 credentials and unknown fields, preserve identical proprietary license bytes.
 
+The seven allowlisted files are UTF-8 text. ZIP output normalizes checkout CRLF
+to LF so a Windows checkout and committed source produce identical public bytes.
+The proprietary license already has the canonical bytes and retains its original
+SHA256. RED: the new cross-platform newline test failed before the helper existed;
+GREEN requires both equivalent line-ending inputs and actual commit/blob matching.
+Earlier Review5 artifacts are retained as superseded checkout-dependent builds.
+
 Pending: authenticated publisher/role; issued domain challenge and actual
 verification; endpoint registration; account/credit fixture for reviewers;
 scanner warnings; accurate screenshots/demo from accepted runtime; submission

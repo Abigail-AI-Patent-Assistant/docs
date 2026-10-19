@@ -16,6 +16,15 @@ SCHEMAS = Path(os.environ.get('PLUGIN_SCHEMA_DIR', HERE / 'schemas'))
 
 
 class PublicationPackageTests(unittest.TestCase):
+    def test_text_artifact_bytes_do_not_depend_on_checkout_line_endings(self):
+        from build_package import canonical_text_bytes
+        with tempfile.TemporaryDirectory() as directory:
+            lf = Path(directory) / 'lf.md'
+            crlf = Path(directory) / 'crlf.md'
+            lf.write_bytes(b'One\nTwo\n')
+            crlf.write_bytes(b'One\r\nTwo\r\n')
+            self.assertEqual(canonical_text_bytes(lf), canonical_text_bytes(crlf))
+
     def test_each_host_receives_its_own_embedded_configuration(self):
         schema = json.loads((SCHEMAS / 'mcp.schema.json').read_text(encoding='utf-8'))
         with tempfile.TemporaryDirectory() as directory:
