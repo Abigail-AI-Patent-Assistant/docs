@@ -72,6 +72,15 @@ SHA256. RED: the new cross-platform newline test failed before the helper existe
 GREEN requires both equivalent line-ending inputs and actual commit/blob matching.
 Earlier Review5 artifacts are retained as superseded checkout-dependent builds.
 
+Public discovery rechecked October19 advertises OAuth resource
+`https://mcp.abigail.app` and issuer `https://api.abigail.app/oauth`, with DCR,
+S256 PKCE and public-client token authentication. The MCP endpoint remains
+`https://mcp.abigail.app/mcp`. Bind `auth.resource` explicitly to the advertised
+origin; an endpoint path is not assumed to be the resource identifier. RED:
+actual ZIP omitted this binding; GREEN requires its presence and wrong-resource
+rejection. No client registration, authorization, token exchange or production
+change is performed by this read-only metadata check.
+
 Pending: authenticated publisher/role; issued domain challenge and actual
 verification; endpoint registration; account/credit fixture for reviewers;
 scanner warnings; accurate screenshots/demo from accepted runtime; submission

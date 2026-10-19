@@ -41,7 +41,8 @@ class PublicationPackageTests(unittest.TestCase):
             jsonschema.Draft202012Validator(schema).validate(portable)
             self.assertNotIn('extensions', portable['mcpServers']['abigail'])
             self.assertEqual(openai['mcpServers']['abigail']['extensions']['com.openai']['auth'],
-                             {'type': 'oauth', 'client': {'mode': 'dcr'}})
+                             {'type': 'oauth', 'client': {'mode': 'dcr'},
+                              'resource': 'https://mcp.abigail.app'})
             # The unchanged external portable schema rejects vendor server extensions.
             # Do not weaken it or falsely label the OpenAI artifact portable-valid.
             with self.assertRaises(jsonschema.ValidationError):
@@ -61,15 +62,18 @@ class PublicationPackageTests(unittest.TestCase):
                  'mcpServers': {'abigail': {'type': 'streamable-http',
                      'url': 'https://mcp.abigail.app/mcp',
                      'extensions': {'com.openai': {'auth': {
-                         'type': 'oauth', 'client': {'mode': 'dcr'}}}}}}}
+                         'type': 'oauth', 'client': {'mode': 'dcr'},
+                         'resource': 'https://mcp.abigail.app'}}}}}}
         validate_openai_mcp(valid)
-        for mutation in ('missing', 'secret', 'headers'):
+        for mutation in ('missing', 'secret', 'headers', 'resource'):
             value = json.loads(json.dumps(valid))
             server = value['mcpServers']['abigail']
             if mutation == 'missing':
                 del server['extensions']
             elif mutation == 'secret':
                 server['extensions']['com.openai']['auth']['clientSecret'] = 'synthetic-test'
+            elif mutation == 'resource':
+                server['extensions']['com.openai']['auth']['resource'] = 'https://wrong.example'
             else:
                 server['headers'] = {'Authorization': 'synthetic-test'}
             with self.assertRaises(jsonschema.ValidationError):

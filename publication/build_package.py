@@ -24,7 +24,8 @@ def validate_openai_mcp(document):
                 "required": list(properties), "additionalProperties": False}
 
     auth = obj({"type": {"const": "oauth"},
-                "client": obj({"mode": {"const": "dcr"}})})
+                "client": obj({"mode": {"const": "dcr"}}),
+                "resource": {"const": "https://mcp.abigail.app"}})
     server = obj({"type": {"const": "streamable-http"},
                   "url": {"const": "https://mcp.abigail.app/mcp"},
                   "extensions": obj({"com.openai": obj({"auth": auth})})})
